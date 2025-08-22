@@ -9,7 +9,7 @@ export default function OrderRelatedCard({ item, inCart, inWishlist, onAddToCart
     if (!imgPath) return '';
     if (imgPath.startsWith('http')) return imgPath;
     // For local images, prepend backend domain in production
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://production-project-1.onrender.com';
     return `${backendUrl}${imgPath}`;
   };
 

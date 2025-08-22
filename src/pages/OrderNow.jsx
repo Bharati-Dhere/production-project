@@ -69,7 +69,7 @@ export default function OrderNow() {
           setWishlistError("");
           // Debug: Modal open, fetching wishlist
           console.log("Wishlist modal opened, fetching wishlist for user:", user?.id);
-          const res = await axios.get(`http://localhost:5000/api/users/by-external-id/${user.id}`);
+          const res = await axios.get(`https://production-project-1.onrender.com/api/users/by-external-id/${user.id}`);
           const mongoUser = res.data?.data;
           const wishlistData = await fetchWishlist(mongoUser._id);
           if (wishlistData && Array.isArray(wishlistData.data)) {
@@ -156,7 +156,7 @@ export default function OrderNow() {
         sum + ((p.price || 0) + (p.deliveryPrice || 0)) * (p.quantity || 1), 0
       );
       try {
-        const orderRes = await fetch('http://localhost:5000/create-order', {
+  const orderRes = await fetch('https://production-project-1.onrender.com/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: grandTotal })
@@ -174,7 +174,7 @@ export default function OrderNow() {
           description: 'Order Payment',
           order_id: orderData.id,
           handler: async function (response) {
-            const verifyRes = await fetch('http://localhost:5000/verify-payment', {
+            const verifyRes = await fetch('https://production-project-1.onrender.com/verify-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(response)

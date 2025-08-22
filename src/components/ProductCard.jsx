@@ -26,7 +26,7 @@ export default function ProductCard({
   const getImageSrc = (imgPath) => {
     if (!imgPath) return defaultAvatar;
     if (imgPath.startsWith('http')) return imgPath;
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://production-project-1.onrender.com';
     return `${backendUrl}${imgPath}`;
   };
   const navigate = useNavigate();

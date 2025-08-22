@@ -11,7 +11,7 @@ const upload = multer({ storage });
 
 // Product image upload endpoint
 router.post('/upload-image', upload.single('image'), async (req, res) => {
-  const imageUrl = `/uploads/${req.file.filename}`;
+  const imageUrl = `https://production-project-1.onrender.com/uploads/${req.file.filename}`;
   res.json({ success: true, imageUrl });
 });
 

@@ -28,7 +28,7 @@ export const updateOrderStatus = async (orderId, { status, deliveryDate }) => {
 
 
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://production-project-1.onrender.com/api';
 
 // Fetch latest best sellers
 export const fetchLatestBestSellers = async () => {

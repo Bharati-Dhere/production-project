@@ -13,7 +13,7 @@ const upload = multer({ storage });
 // Profile image upload endpoint
 router.post('/profile-image', upload.single('image'), async (req, res) => {
   const userId = req.body.userId;
-  const imageUrl = `/uploads/${req.file.filename}`;
+  const imageUrl = `https://production-project-1.onrender.com/uploads/${req.file.filename}`;
   await User.findByIdAndUpdate(userId, { profileImage: imageUrl });
   res.json({ success: true, imageUrl });
 });

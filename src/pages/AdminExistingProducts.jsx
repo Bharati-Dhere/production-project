@@ -51,7 +51,7 @@ const AdminExistingProducts = () => {
   const getImageSrc = (imgPath) => {
     if (!imgPath) return '';
     if (imgPath.startsWith('http')) return imgPath;
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://production-project-1.onrender.com';
     return `${backendUrl}${imgPath}`;
   };
   const [type, setType] = useState("Product");
