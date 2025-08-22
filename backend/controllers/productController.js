@@ -16,14 +16,24 @@ exports.getAllProducts = async (req, res) => {
       };
     }
     const products = await Product.find(query);
+    const backendUrl = 'https://production-project-1.onrender.com';
     const productsWithRatings = products.map(product => {
       const reviews = product.reviews || [];
       const ratings = product.ratings || [];
       const allRatings = reviews.length > 0 ? reviews : ratings;
       const ratingCount = allRatings.length;
       const avgRating = ratingCount ? (allRatings.reduce((sum, r) => sum + r.value, 0) / ratingCount) : null;
+      const obj = product.toObject();
+      // Fix image field
+      if (obj.image && !obj.image.startsWith('http')) {
+        obj.image = `${backendUrl}${obj.image}`;
+      }
+      // Fix images array
+      if (Array.isArray(obj.images)) {
+        obj.images = obj.images.map(img => img && !img.startsWith('http') ? `${backendUrl}${img}` : img);
+      }
       return {
-        ...product.toObject(),
+        ...obj,
         avgRating: avgRating !== null ? Number(avgRating.toFixed(2)) : null,
         ratingCount,
       };
@@ -61,7 +71,15 @@ exports.getProductById = async (req, res) => {
     const allRatings = reviews.length > 0 ? reviews : ratings;
     const ratingCount = allRatings.length;
     const avgRating = ratingCount ? (allRatings.reduce((sum, r) => sum + r.value, 0) / ratingCount).toFixed(2) : null;
-    res.json({ ...product.toObject(), avgRating, ratingCount, reviews });
+    const backendUrl = 'https://production-project-1.onrender.com';
+    const obj = product.toObject();
+    if (obj.image && !obj.image.startsWith('http')) {
+      obj.image = `${backendUrl}${obj.image}`;
+    }
+    if (Array.isArray(obj.images)) {
+      obj.images = obj.images.map(img => img && !img.startsWith('http') ? `${backendUrl}${img}` : img);
+    }
+    res.json({ ...obj, avgRating, ratingCount, reviews });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error', data: null });
   }
