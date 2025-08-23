@@ -85,7 +85,7 @@ export default function AuthModal({ onClose, role }) {
         return;
       }
       // Use backend login for all users
-      const res = await fetch("/api/auth/login", {
+  const res = await fetch("https://production-project-1.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -192,7 +192,7 @@ export default function AuthModal({ onClose, role }) {
         await signUp.update({ password: signupData.password });
         // Create user in backend database with role
         try {
-          await fetch("/api/users", {
+          await fetch("https://production-project-1.onrender.com/api/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: signupData.email, role, password: signupData.password })
