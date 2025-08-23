@@ -41,9 +41,9 @@ export default function AdminDashboard() {
         const [productsRes, accessoriesRes, ordersRes, usersRes, feedbackRes] = await Promise.all([
           fetchProducts(),
           fetchAccessories(),
-          axios.get('/api/orders', { withCredentials: true }),
-          axios.get('/api/users', { withCredentials: true }),
-          axios.get('/api/feedback'),
+          axios.get('https://production-project-1.onrender.com/api/admin/orders', { withCredentials: true }),
+          axios.get('https://production-project-1.onrender.com/api/admin/users', { withCredentials: true }),
+          axios.get('https://production-project-1.onrender.com/api/feedback', { withCredentials: true }),
         ]);
         setProducts(Array.isArray(productsRes) ? productsRes : []);
         setAccessories(Array.isArray(accessoriesRes) ? accessoriesRes : []);
@@ -75,8 +75,8 @@ export default function AdminDashboard() {
         if (category) params.push(`category=${encodeURIComponent(category)}`);
         if (brand) params.push(`brand=${encodeURIComponent(brand)}`);
         if (dateRange) params.push(`range=${encodeURIComponent(dateRange)}`);
-        const url = `/api/analytics/sales?${params.join('&')}`;
-        const salesRes = await axios.get(url);
+  const url = `https://production-project-1.onrender.com/api/analytics/sales?${params.join('&')}`;
+  const salesRes = await axios.get(url, { withCredentials: true });
         setSales(salesRes.data.data.sales || []);
         setHighestSale(salesRes.data.data.highestSale || null);
         setLowestSale(salesRes.data.data.lowestSale || null);
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
     );
     setOrders(updatedOrders);
     // Update order status in backend
-    await fetch(`/api/admin/orders/${orderId}`, {
+    await fetch(`https://production-project-1.onrender.com/api/admin/orders/${orderId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
