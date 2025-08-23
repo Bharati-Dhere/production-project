@@ -50,18 +50,33 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password, role } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    console.log('Login attempt:', { email, role });
+    if (!user) {
+      console.log('User not found');
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
     if (role === 'admin') {
-      if (user.role !== 'admin') return res.status(403).json({ message: 'Only admin can login here.' });
+      if (user.role !== 'admin') {
+        console.log('User is not admin:', user.role);
+        return res.status(403).json({ message: 'Only admin can login here.' });
+      }
     } else {
-      if (user.role !== 'user') return res.status(403).json({ message: 'Only user can login here.' });
+      if (user.role !== 'user') {
+        console.log('User is not user:', user.role);
+        return res.status(403).json({ message: 'Only user can login here.' });
+      }
     }
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ message: 'Invalid credentials' });
+    console.log('Password match:', match);
+    if (!match) {
+      console.log('Password does not match');
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
-  res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
+    res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
     res.json({ user });
   } catch (err) {
+    console.log('Login error:', err);
     res.status(500).json({ message: err.message });
   }
 });

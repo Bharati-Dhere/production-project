@@ -1,21 +1,29 @@
-// Usage: node backend/scripts/makeAdmin.js <email>
+// Usage: node backend/scripts/makeAdmin.js <email> <password>
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 require('dotenv').config();
 
 const email = process.argv[2];
-if (!email) {
-  console.error('Usage: node makeAdmin.js <email>');
+const password = process.argv[3];
+if (!email || !password) {
+  console.error('Usage: node makeAdmin.js <email> <password>');
   process.exit(1);
 }
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(async () => {
-    const user = await User.findOneAndUpdate({ email }, { role: 'admin' }, { new: true });
-    if (user) {
-      console.log(`User ${email} is now an admin.`);
+    let user = await User.findOne({ email });
+    if (!user) {
+      const hash = await bcrypt.hash(password, 10);
+      user = await User.create({ email, password: hash, role: 'admin', hasPassword: true });
+      console.log('Admin user created:', email);
     } else {
-      console.log(`User with email ${email} not found.`);
+      user.role = 'admin';
+      user.password = await bcrypt.hash(password, 10);
+      user.hasPassword = true;
+      await user.save();
+      console.log('User updated to admin:', email);
     }
     process.exit(0);
   })
