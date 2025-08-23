@@ -24,41 +24,10 @@ const ordersRoutes = require('./routes/orders');
 const cookieParser = require('cookie-parser');
 const app = express();
 
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://project-grp.vercel.app'
-];
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  next();
-});
-
-// Log CORS headers for debugging
-
-// Ensure Access-Control-Allow-Origin is set for all responses
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || 'http://localhost:3000');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  res.on('finish', () => {
-    console.log('CORS Headers:', {
-      'Access-Control-Allow-Origin': res.getHeader('Access-Control-Allow-Origin'),
-      'Access-Control-Allow-Credentials': res.getHeader('Access-Control-Allow-Credentials'),
-    });
-  });
-  next();
-});
-
-// Catch-all OPTIONS handler for preflight requests
-app.options('*', cors());
+app.use(cors({
+  origin: 'https://production-project-psi.vercel.app',
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
