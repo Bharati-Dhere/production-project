@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function AdminLogin() {
+  const { login } = useAuth();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
-  const [showForgot, setShowForgot] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotMsg, setForgotMsg] = useState("");
   const navigate = useNavigate();
 
-  // Inputs are now editable
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -18,47 +16,16 @@ export default function AdminLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    try {
-      // Call backend login endpoint
-      const res = await fetch("https://production-project-1.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: form.username, password: form.password, role: "admin" })
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        // Show correct error for role
-        if (data.message && data.message.includes('Only user can login here.')) {
-          setError('Only admin can login here.');
-        } else {
-          setError(data.message || "Invalid credentials");
-        }
-        return;
-      }
-      // Success: backend sets cookie, user is now authenticated as admin
+    const success = await login({ email: form.username, password: form.password, role: "admin" });
+    if (success) {
       navigate("/admin/dashboard");
-    } catch (err) {
-      setError("Login failed. Please try again.");
+    } else {
+      setError("Invalid admin credentials or login failed.");
     }
   };
 
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setForgotMsg("");
-    // Call backend to send reset link (only for admin role)
-    const res = await fetch("https://production-project-1.onrender.com/api/auth/admin-forgot-password/send-code", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email: forgotEmail })
-    });
-    const data = await res.json();
-    setForgotMsg(data.message || "If your email is registered as admin, you will receive a reset link.");
-  };
-
   return (
-  <div className="min-h-screen flex items-center justify-center relative" style={{ background: 'linear-gradient(rgba(30,30,30,0.7), rgba(30,30,30,0.7)), url("' + require('../assets/admin-bg.jpg') + '") center/cover no-repeat' }}>
+    <div className="min-h-screen flex items-center justify-center relative" style={{ background: 'linear-gradient(rgba(30,30,30,0.7), rgba(30,30,30,0.7)), url("' + require('../assets/admin-bg.jpg') + '") center/cover no-repeat' }}>
       <div className="absolute inset-0 bg-black bg-opacity-40 z-0"></div>
       <form className="bg-white bg-opacity-90 p-10 rounded-2xl shadow-2xl w-full max-w-md z-10 flex flex-col items-center" onSubmit={handleLogin} style={{ backdropFilter: 'blur(4px)' }}>
         <h2 className="text-3xl font-extrabold mb-8 text-purple-700 text-center tracking-wide drop-shadow">Admin Login</h2>
