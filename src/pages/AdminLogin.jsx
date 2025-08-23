@@ -20,7 +20,7 @@ export default function AdminLogin() {
     setError("");
     try {
       // Call backend login endpoint
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("https://production-project-1.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -47,9 +47,10 @@ export default function AdminLogin() {
     e.preventDefault();
     setForgotMsg("");
     // Call backend to send reset link (only for admin role)
-    const res = await fetch("/api/auth/admin-forgot-password", {
+    const res = await fetch("https://production-project-1.onrender.com/api/auth/admin-forgot-password/send-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ email: forgotEmail })
     });
     const data = await res.json();
