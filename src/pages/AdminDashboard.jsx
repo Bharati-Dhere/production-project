@@ -223,10 +223,22 @@ export default function AdminDashboard() {
             }
             return (
               <>
-                <span className="font-semibold">{prod?.name || acc?.name || highestSale.name || '-'}</span><br />
+                <span className="font-semibold">{
+                  typeof (prod?.name || acc?.name || highestSale.name) === 'object'
+                    ? JSON.stringify(prod?.name || acc?.name || highestSale.name)
+                    : (prod?.name || acc?.name || highestSale.name || '-')
+                }</span><br />
                 Type: {prod ? 'Product' : acc ? 'Accessory' : (highestSale.type || '-') }<br />
-                Category: {prod?.category || acc?.category || highestSale.category || '-'}<br />
-                Brand: {prod?.brand || acc?.brand || highestSale.brand || '-'}<br />
+                Category: {
+                  typeof (prod?.category || acc?.category || highestSale.category) === 'object'
+                    ? JSON.stringify(prod?.category || acc?.category || highestSale.category)
+                    : (prod?.category || acc?.category || highestSale.category || '-')
+                }<br />
+                Brand: {
+                  typeof (prod?.brand || acc?.brand || highestSale.brand) === 'object'
+                    ? JSON.stringify(prod?.brand || acc?.brand || highestSale.brand)
+                    : (prod?.brand || acc?.brand || highestSale.brand || '-')
+                }<br />
                 Sold: {highestSale.totalSold}, Revenue: {highestSale.totalRevenue}
               </>
             );
@@ -245,10 +257,22 @@ export default function AdminDashboard() {
             }
             return (
               <>
-                <span className="font-semibold">{prod?.name || acc?.name || lowestSale.name || '-'}</span><br />
+                <span className="font-semibold">{
+                  typeof (prod?.name || acc?.name || lowestSale.name) === 'object'
+                    ? JSON.stringify(prod?.name || acc?.name || lowestSale.name)
+                    : (prod?.name || acc?.name || lowestSale.name || '-')
+                }</span><br />
                 Type: {prod ? 'Product' : acc ? 'Accessory' : (lowestSale.type || '-') }<br />
-                Category: {prod?.category || acc?.category || lowestSale.category || '-'}<br />
-                Brand: {prod?.brand || acc?.brand || lowestSale.brand || '-'}<br />
+                Category: {
+                  typeof (prod?.category || acc?.category || lowestSale.category) === 'object'
+                    ? JSON.stringify(prod?.category || acc?.category || lowestSale.category)
+                    : (prod?.category || acc?.category || lowestSale.category || '-')
+                }<br />
+                Brand: {
+                  typeof (prod?.brand || acc?.brand || lowestSale.brand) === 'object'
+                    ? JSON.stringify(prod?.brand || acc?.brand || lowestSale.brand)
+                    : (prod?.brand || acc?.brand || lowestSale.brand || '-')
+                }<br />
                 Sold: {lowestSale.totalSold}, Revenue: {lowestSale.totalRevenue}
               </>
             );
@@ -280,7 +304,7 @@ export default function AdminDashboard() {
                       else if (prod) navigate(`/admin/edit-product/${prod._id || prod.id}?type=Product`);
                     }}
                   >
-                    {i.name} (Stock: {i.stock})
+                    {typeof i.name === 'object' ? JSON.stringify(i.name) : i.name} (Stock: {typeof i.stock === 'object' ? JSON.stringify(i.stock) : i.stock})
                   </li>
                 );
               })}
@@ -360,7 +384,7 @@ export default function AdminDashboard() {
                 <strong>Highest Sale:</strong><br />
                 {highestSale ? (
                   <>
-                    <span className="font-semibold">{highestSale.name}</span><br />
+                    <span className="font-semibold">{typeof highestSale.name === 'object' ? JSON.stringify(highestSale.name) : highestSale.name}</span><br />
                     Sold: {highestSale.totalSold}, Revenue: \t{highestSale.totalRevenue}
                   </>
                 ) : 'N/A'}
@@ -369,7 +393,7 @@ export default function AdminDashboard() {
                 <strong>Lowest Sale:</strong><br />
                 {lowestSale ? (
                   <>
-                    <span className="font-semibold">{lowestSale.name}</span><br />
+                    <span className="font-semibold">{typeof lowestSale.name === 'object' ? JSON.stringify(lowestSale.name) : lowestSale.name}</span><br />
                     Sold: {lowestSale.totalSold}, Revenue: {lowestSale.totalRevenue}
                   </>
                 ) : 'N/A'}

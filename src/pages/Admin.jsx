@@ -136,12 +136,12 @@ const Admin = () => {
             <tbody>
               {products.map((p) => (
                 <tr key={p.id} className="border-t border-gray-300">
-                  <td className="p-2">{p.name}</td>
-                  <td className="p-2">{p.category}</td>
-                  <td className="p-2">{p.brand}</td>
-                  <td className="p-2">₹{p.price}</td>
-                  <td className="p-2">{p.color}</td>
-                  <td className="p-2">{p.rating}</td>
+                  <td className="p-2">{typeof p.name === 'object' ? JSON.stringify(p.name) : p.name}</td>
+                  <td className="p-2">{typeof p.category === 'object' ? JSON.stringify(p.category) : p.category}</td>
+                  <td className="p-2">{typeof p.brand === 'object' ? JSON.stringify(p.brand) : p.brand}</td>
+                  <td className="p-2">₹{typeof p.price === 'object' ? JSON.stringify(p.price) : p.price}</td>
+                  <td className="p-2">{typeof p.color === 'object' ? JSON.stringify(p.color) : p.color}</td>
+                  <td className="p-2">{typeof p.rating === 'object' ? JSON.stringify(p.rating) : p.rating}</td>
                   <td className="p-2">
                     <button
                       className="bg-red-500 text-white px-3 py-1 rounded"
@@ -177,9 +177,9 @@ const Admin = () => {
             <tbody>
               {signupUsers.map((u, idx) => (
                 <tr key={u._id || idx} className="border-t border-gray-300">
-                  <td className="p-2">{u.name}</td>
-                  <td className="p-2">{u.email}</td>
-                  <td className="p-2">{u.role || 'user'}</td>
+                  <td className="p-2">{typeof u.name === 'object' ? JSON.stringify(u.name) : u.name}</td>
+                  <td className="p-2">{typeof u.email === 'object' ? JSON.stringify(u.email) : u.email}</td>
+                  <td className="p-2">{typeof u.role === 'object' ? JSON.stringify(u.role) : (u.role || 'user')}</td>
                   <td className="p-2">
                     {/* Optionally implement delete via backend */}
                   </td>
@@ -199,9 +199,9 @@ const Admin = () => {
           <ul className="space-y-4">
             {feedbacks.map((fb, i) => (
               <li key={i} className="p-4 border rounded-md bg-gray-100">
-                <p><strong>Name:</strong> {fb.name || "Guest"}</p>
-                <p><strong>Email:</strong> {fb.email || "Not provided"}</p>
-                <p><strong>Message:</strong> {fb.message}</p>
+                <p><strong>Name:</strong> {typeof fb.name === 'object' ? JSON.stringify(fb.name) : (fb.name || "Guest")}</p>
+                <p><strong>Email:</strong> {typeof fb.email === 'object' ? JSON.stringify(fb.email) : (fb.email || "Not provided")}</p>
+                <p><strong>Message:</strong> {typeof fb.message === 'object' ? JSON.stringify(fb.message) : fb.message}</p>
               </li>
             ))}
           </ul>
