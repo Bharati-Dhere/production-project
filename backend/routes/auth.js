@@ -6,59 +6,44 @@ const User = require('../models/User');
 const router = express.Router();
 const admin = require('firebase-admin');
 
-// Clerk/Google login by email only (no password required)
-router.post('/login/clerk', async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email required' });
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'User not found' });
-    // Only allow if user has no password set (i.e., Clerk/Google user)
-    if (user.hasPassword) return res.status(403).json({ message: 'Password login required' });
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
-    res.json({ user });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+
+// Firebase email verification code flow
+const verificationCodes = {};
+const { sendMail } = require('../controllers/mailer');
+const crypto = require('crypto');
+
+// Send verification code for signup
+router.post('/signup/send-code', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email required' });
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  verificationCodes[email] = { code, expires: Date.now() + 10 * 60 * 1000 };
+  await sendMail({
+    to: email,
+    subject: 'Your Signup Verification Code',
+    text: `Your verification code is: ${code}`,
+    html: `<p>Your verification code is: <b>${code}</b></p>`
+  });
+  res.json({ message: 'Verification code sent to email.' });
 });
 
-// Signup
-router.post('/signup', async (req, res) => {
-  try {
-    const { name, email, password, mobile, idToken } = req.body;
-    if (!mobile || typeof mobile !== 'string' || !mobile.trim()) {
-      return res.status(400).json({ message: 'Mobile number is required' });
-    }
-    if (!idToken) {
-      return res.status(400).json({ message: 'Firebase ID token required for mobile verification' });
-    }
-    // Verify Firebase ID token
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
-      });
-    }
-    let decodedToken;
-    try {
-      decodedToken = await admin.auth().verifyIdToken(idToken);
-    } catch (err) {
-      return res.status(400).json({ message: 'Invalid Firebase ID token' });
-    }
-    if (!decodedToken.phone_number || !decodedToken.phone_number.endsWith(mobile)) {
-      return res.status(400).json({ message: 'Mobile number mismatch or not verified' });
-    }
-    const existingEmail = await User.findOne({ email });
-    if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
-    const existingMobile = await User.findOne({ mobile });
-    if (existingMobile) return res.status(400).json({ message: 'Mobile number already exists' });
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hash, mobile });
-    res.status(201).json({ user });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+// Verify code and set password for signup
+router.post('/signup/verify', async (req, res) => {
+  const { name, email, password, mobile, code } = req.body;
+  if (!verificationCodes[email] || verificationCodes[email].code !== code || verificationCodes[email].expires < Date.now()) {
+    return res.status(400).json({ message: 'Invalid or expired verification code.' });
   }
+  delete verificationCodes[email];
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
+  const existingMobile = await User.findOne({ mobile });
+  if (existingMobile) return res.status(400).json({ message: 'Mobile number already exists' });
+  const hash = await bcrypt.hash(password, 10);
+  const user = await User.create({ name, email, password: hash, mobile });
+  res.status(201).json({ user });
 });
+
+// ...existing code...
 
 // Login
 router.post('/login', async (req, res) => {
