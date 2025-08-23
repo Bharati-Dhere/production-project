@@ -24,7 +24,7 @@ const Admin = () => {
     async function fetchUsers() {
       setLoadingUsers(true);
       try {
-        const res = await fetch('/api/users', { credentials: 'include' });
+  const res = await fetch('https://production-project-1.onrender.com/api/users', { credentials: 'include' });
         if (!res.ok) throw new Error('Failed to fetch users');
         const data = await res.json();
         // Use .data property from backend response

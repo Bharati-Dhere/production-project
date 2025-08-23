@@ -7,7 +7,7 @@ export const ReviewProvider = ({ children }) => {
 
   useEffect(() => {
     // Fetch reviews from backend
-    fetch('/api/reviews', { credentials: 'include' })
+  fetch('https://production-project-1.onrender.com/api/reviews', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data && Array.isArray(data.data)) {
@@ -23,7 +23,7 @@ export const ReviewProvider = ({ children }) => {
     try {
       // Ensure user reviews have a 'text' field for filtering
       const userReview = { ...review, text: review.description || review.text };
-      const res = await fetch('/api/reviews', {
+      const res = await fetch('https://production-project-1.onrender.com/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

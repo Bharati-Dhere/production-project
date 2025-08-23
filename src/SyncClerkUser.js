@@ -12,7 +12,7 @@ export default function SyncClerkUser() {
         name: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : undefined,
         clerkId: user.id,
       }; 
-      fetch("/api/users", {
+  fetch("https://production-project-1.onrender.com/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -20,13 +20,13 @@ export default function SyncClerkUser() {
         .then(res => res.json())
         .then(data => {
           // After syncing, fetch user from new public route
-          return fetch(`/api/users/by-email/${encodeURIComponent(payload.email)}`);
+          return fetch(`https://production-project-1.onrender.com/api/users/by-email/${encodeURIComponent(payload.email)}`);
         })
         .then(res => res.json())
         .then(userData => {
           console.log("Clerk user fetched from backend:", userData);
           // Log in Clerk user to set JWT cookie for session
-          return fetch("/api/auth/login/clerk", {
+          return fetch("https://production-project-1.onrender.com/api/auth/login/clerk", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: payload.email })

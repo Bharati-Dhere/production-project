@@ -32,7 +32,7 @@ export default function ClerkSessionSync() {
     (async () => {
       try {
         console.log("[ClerkSessionSync] Checking/Upserting user in backend:", { email, name });
-  const checkRes = await fetch(`/api/users/by-email/${encodeURIComponent(email)}`);
+  const checkRes = await fetch(`https://production-project-1.onrender.com/api/users/by-email/${encodeURIComponent(email)}`);
         let exists = false;
         if (checkRes.ok) {
           const checkData = await checkRes.json();
@@ -40,7 +40,7 @@ export default function ClerkSessionSync() {
         }
         if (!exists) {
           // Upsert user in backend
-          const upsertRes = await fetch("/api/users", {
+          const upsertRes = await fetch("https://production-project-1.onrender.com/api/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, name, role: "user" })

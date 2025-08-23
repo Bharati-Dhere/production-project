@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		async function hydrateUser() {
 			try {
-				const res = await fetch("/api/auth/me", { credentials: "include" });
+				const res = await fetch("https://production-project-1.onrender.com/api/auth/me", { credentials: "include" });
 				if (res.ok) {
 					const data = await res.json();
 					if (data && data.user) {
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
 
 const login = async (userData) => {
        try {
-	       const res = await fetch(`/api/users/by-email/${encodeURIComponent(userData.email)}`);
+		const res = await fetch(`https://production-project-1.onrender.com/api/users/by-email/${encodeURIComponent(userData.email)}`);
 	       const data = await res.json();
 	       if (data && data.data) {
 		       setUser(data.data);
@@ -40,7 +40,7 @@ const login = async (userData) => {
 	const logout = async () => {
 		setUser(null);
 		try {
-			await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+			await fetch("https://production-project-1.onrender.com/api/auth/logout", { method: "POST", credentials: "include" });
 		} catch {}
 	};
 
