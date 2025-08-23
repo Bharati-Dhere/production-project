@@ -13,7 +13,7 @@ export default function Reviews() {
 
   useEffect(() => {
     // Load all reviews from backend
-    fetch('/api/reviews', { credentials: 'include' })
+  fetch('https://production-project-1.onrender.com/api/reviews', { credentials: 'include' })
       .then(res => res.json())
       .then(setReviews)
       .catch(() => setReviews([]));
@@ -35,7 +35,7 @@ export default function Reviews() {
 
   const handleAddReview = async () => {
     // Get user from context or backend session
-    const res = await fetch('/api/auth/profile', { credentials: 'include' });
+  const res = await fetch('https://production-project-1.onrender.com/api/auth/profile', { credentials: 'include' });
     const user = await res.json();
     if (!user || !user.email) {
       setShowAuthModal(true);
@@ -49,7 +49,7 @@ export default function Reviews() {
       userEmail: user.email,
       userName: user.name || "User",
     };
-    const reviewRes = await fetch('/api/reviews', {
+    const reviewRes = await fetch('https://production-project-1.onrender.com/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
