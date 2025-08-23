@@ -1,12 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import PasswordResetModal from "./PasswordReset";
-import { useSignIn, useSignUp, useClerk } from "@clerk/clerk-react";
 import { useAuth } from "../context/AuthContext";
 import { FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
-
-
 
 // role is now passed as a prop, not managed in modal
 export default function AuthModal({ onClose, role }) {
@@ -23,9 +19,7 @@ export default function AuthModal({ onClose, role }) {
   const [signupErrors, setSignupErrors] = useState({});
   const [forgotError, setForgotError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleError, setGoogleError] = useState("");
 
-  // If role prop changes, reset signup/login forms (optional, for safety)
   useEffect(() => {
     setLoginData({ email: "", password: "" });
     setSignupData({ email: "", password: "", confirmPassword: "" });
@@ -36,55 +30,14 @@ export default function AuthModal({ onClose, role }) {
     setLoginErrors({});
     setSignupErrors({});
     setForgotError("");
-    setGoogleError("");
   }, [role]);
 
-  const { signIn } = useSignIn();
-  const { signUp } = useSignUp();
-  const { setSession, openSignIn, signOut } = useClerk();
-
-  // Google login handler
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setGoogleError("");
-    try {
-      if (typeof signOut === "function") {
-        await signOut();
-      }
-      await signIn.authenticateWithRedirect({ strategy: "oauth_google", redirectUrl: window.location.href });
-      // After redirect, handle backend sync in a useEffect or callback (not possible here)
-    } catch (err) {
-      setGoogleError(err.errors?.[0]?.message || "Google login failed. Try signing up first.");
-    }
-    setLoading(false);
-  }
-
-  // Google signup handler
-  const handleGoogleSignup = async () => {
-    setLoading(true);
-    setGoogleError("");
-    try {
-      await signUp.authenticateWithRedirect({ strategy: "oauth_google", redirectUrl: window.location.href });
-      // After redirect, handle backend sync in a useEffect or callback (not possible here)
-    } catch (err) {
-      setGoogleError(err.errors?.[0]?.message || "Google signup failed.");
-    }
-    setLoading(false);
-  };
-
-  // Login handler using Clerk
+  // Login handler using backend only
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setLoginErrors({});
-    setGoogleError("");
     try {
-      if (!loginData.email || !loginData.password) {
-        setLoginErrors({ general: "Please fill all fields." });
-        setLoading(false);
-        return;
-      }
-      // Use backend login for all users
       const res = await fetch("https://production-project-1.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -102,59 +55,45 @@ export default function AuthModal({ onClose, role }) {
       setLoginErrors({});
       onClose && onClose();
     } catch (err) {
-      const msg = err.errors?.[0]?.message || err.message || "Login failed.";
-      setLoginErrors({ general: msg.includes('strategy') ? 'Invalid email or password.' : msg });
+      setLoginErrors({ general: err.message || "Login failed." });
     }
     setLoading(false);
   };
 
-  // Signup handler using Clerk
-  // Step 1: Request verification code for email
+  // Signup step 1: Request verification code
   const handleSignupRequestVerification = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSignupErrors({});
-    setGoogleError("");
     if (!signupData.email) {
       setSignupErrors({ general: "Please enter your email." });
       setLoading(false);
       return;
     }
     try {
-      // Always sign out before starting a new signUp to avoid 'session already exists' error
-      if (typeof signOut === 'function') await signOut();
-      if (signUp && signUp.reset) signUp.reset();
-      await signUp.create({ emailAddress: signupData.email });
-      const prep = await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      const res = await fetch("https://production-project-1.onrender.com/api/auth/signup/send-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signupData.email })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSignupErrors({ general: data.message || "Could not send verification code." });
+        setLoading(false);
+        return;
+      }
       setSignupStep(1);
     } catch (err) {
-      // If error is 'session_exists', force signOut and reset, then retry once
-      if (err.errors && err.errors[0]?.code === 'session_exists') {
-        try {
-          if (typeof signOut === 'function') await signOut();
-          if (signUp && signUp.reset) signUp.reset();
-          await signUp.create({ emailAddress: signupData.email });
-          const prep = await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-          setSignupStep(1);
-          setLoading(false);
-          return;
-        } catch (err2) {
-          setSignupErrors({ general: err2.errors?.[0]?.message || err2.message || "Could not send verification code." });
-          setLoading(false);
-          return;
-        }
-      }
-      setSignupErrors({ general: err.errors?.[0]?.message || err.message || "Could not send verification code." });
+      setSignupErrors({ general: err.message || "Could not send verification code." });
     }
     setLoading(false);
-  }
+  };
 
-  // Step 2: Verify code and complete signup
+  // Signup step 2: Verify code and complete signup
   const handleSignupVerifyAndComplete = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSignupErrors({});
-    setGoogleError("");
     if (!signupVerificationCode) {
       setSignupErrors({ general: "Please enter the verification code sent to your email." });
       setLoading(false);
@@ -171,55 +110,36 @@ export default function AuthModal({ onClose, role }) {
       return;
     }
     try {
-      // Complete verification and update user info
-      let verified = false;
-      try {
-        const verifyRes = await signUp.attemptEmailAddressVerification({ code: signupVerificationCode });
-        if (verifyRes.status === "complete" || verifyRes.verifications?.emailAddress?.status === 'verified') {
-          verified = true;
-        }
-      } catch (err) {
-        // If already verified, Clerk throws an error with code 'verification_already_verified'
-        if (err.errors && err.errors[0]?.code === 'verification_already_verified') {
-          verified = true;
-        } else {
-          setSignupErrors({ general: err.errors?.[0]?.message || err.message || "Verification failed." });
-          setLoading(false);
-          return;
-        }
+      const resVerify = await fetch("https://production-project-1.onrender.com/api/auth/signup/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: signupData.email.split('@')[0],
+          email: signupData.email,
+          password: signupData.password,
+          mobile: "",
+          code: signupVerificationCode
+        })
+      });
+      const dataVerify = await resVerify.json();
+      if (!resVerify.ok) {
+        setSignupErrors({ general: dataVerify.message || "Verification failed." });
+        setLoading(false);
+        return;
       }
-      if (verified) {
-        await signUp.update({ password: signupData.password });
-        // Create user in backend database with role
-        try {
-          await fetch("https://production-project-1.onrender.com/api/users", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: signupData.email, role, password: signupData.password })
-          });
-        } catch (err) {
-          // Optionally show a warning, but don't block login
-          toast.warn("Signup succeeded, but failed to save user in backend.");
-        }
-        setSignupErrors({});
-        // Sign out to clear any session before switching to login
-        if (typeof signOut === 'function') await signOut();
-  setIsLogin(true);
-  setLoginData({ email: signupData.email, password: "" });
-  toast.success("Signup successful! Please log in.");
-  setSignupStep(0);
-  setSignupVerificationCode("");
-  // Do NOT close modal; show login form with email prefilled
-      } else {
-        setSignupErrors({ general: "Invalid or expired code. Please try again." });
-      }
+      setSignupErrors({});
+      setIsLogin(true);
+      setLoginData({ email: signupData.email, password: "" });
+      toast.success("Signup successful! Please log in.");
+      setSignupStep(0);
+      setSignupVerificationCode("");
     } catch (err) {
-      setSignupErrors({ general: err.errors?.[0]?.message || err.message || "Verification failed." });
+      setSignupErrors({ general: err.message || "Verification failed." });
     }
     setLoading(false);
-  }
+  };
 
-  // Forgot password handler: open Clerk's reset password modal
+  // Forgot password handler using backend only
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -230,19 +150,20 @@ export default function AuthModal({ onClose, role }) {
       return;
     }
     try {
-      // Check if email exists in Clerk before opening reset (secure way is via backend/webhook, but frontend can attempt signIn.create to check)
-      await signIn.create({ identifier: forgotEmail, strategy: 'password' });
-      // If no error, user exists, open reset modal
-      await openSignIn({ initialScreen: "resetPassword", redirectUrl: window.location.href, afterSignInUrl: window.location.href });
-      // After password reset, update backend (user will be redirected, so this should be handled in a callback or useEffect after reset)
-    } catch (err) {
-      // If error is 'identifier_not_found', show user-friendly message
-      const msg = err.errors?.[0]?.message || err.message || "Could not open password reset. Try again later.";
-      if (msg.toLowerCase().includes('identifier_not_found') || msg.toLowerCase().includes('not found')) {
-        setForgotError("No account found with that email.");
-      } else {
-        setForgotError("Could not open password reset. Try again later.");
+      const res = await fetch("https://production-project-1.onrender.com/api/auth/admin-forgot-password/send-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setForgotError(data.message || "Could not send verification code.");
+        setLoading(false);
+        return;
       }
+      setForgotStep(2); // Show message to check email
+    } catch (err) {
+      setForgotError(err.message || "Could not send verification code.");
     }
     setLoading(false);
   };
@@ -267,7 +188,6 @@ export default function AuthModal({ onClose, role }) {
               showModal={showPasswordReset}
               setShowModal={setShowPasswordReset}
               user={{ email: forgotEmail, emailVerified: true }}
-              // When password reset is successful, switch to login modal
               onSuccess={() => {
                 setForgotStep(0);
                 setForgotEmail("");
@@ -287,7 +207,7 @@ export default function AuthModal({ onClose, role }) {
           </div>
         ) : forgotStep === 2 ? (
           <div className="w-full text-center">
-            <p className="text-green-700 mb-4">Check your email for a password reset link.</p>
+            <p className="text-green-700 mb-4">Check your email for a password reset code.</p>
             <button
               className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200 text-base sm:text-sm"
               onClick={() => { setForgotStep(0); setForgotEmail(""); setForgotError(""); setIsLogin(true); }}
@@ -314,7 +234,6 @@ export default function AuthModal({ onClose, role }) {
                 className="w-full border p-2 rounded text-sm"
                 autoComplete="current-password"
               />
-              {/* Role selection removed: role is passed as prop */}
               {loginErrors.general && <p className="text-red-600 text-sm mb-2">{loginErrors.general}</p>}
               <button
                 type="submit"
@@ -325,8 +244,6 @@ export default function AuthModal({ onClose, role }) {
               </button>
             </form>
             <div className="my-2 w-full flex flex-col items-center">
-              
-              
               <button
                 type="button"
                 className="w-full text-blue-600 underline text-sm mt-2"
@@ -348,7 +265,6 @@ export default function AuthModal({ onClose, role }) {
                   className="w-full border p-2 rounded text-sm"
                   autoComplete="username"
                 />
-                {/* Role selection removed: role is passed as prop */}
                 {signupErrors.general && <p className="text-red-600 text-sm mb-2">{signupErrors.general}</p>}
                 <button
                   type="submit"
@@ -385,7 +301,6 @@ export default function AuthModal({ onClose, role }) {
                   className="w-full border p-2 rounded text-sm"
                   autoComplete="new-password"
                 />
-                {/* Role selection removed: role is passed as prop */}
                 {signupErrors.confirmPassword && <p className="text-red-600 text-sm mt-1">{signupErrors.confirmPassword}</p>}
                 {signupErrors.general && <p className="text-red-600 text-sm mb-2">{signupErrors.general}</p>}
                 <button
@@ -397,15 +312,14 @@ export default function AuthModal({ onClose, role }) {
                 </button>
               </form>
             )}
-            
           </>
         )}
         <p className="text-center mt-4 text-sm">
           {forgotStep ? null : isLogin ? (
             <>
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <button
-                onClick={() => { setIsLogin(false); setLoginErrors({}); setGoogleError(""); }}
+                onClick={() => { setIsLogin(false); setLoginErrors({}); }}
                 className="text-blue-600 underline"
               >
                 Sign Up
@@ -413,9 +327,9 @@ export default function AuthModal({ onClose, role }) {
             </>
           ) : (
             <>
-              Already have an account?{' '}
+              Already have an account?{" "}
               <button
-                onClick={() => { setIsLogin(true); setSignupErrors({}); setGoogleError(""); }}
+                onClick={() => { setIsLogin(true); setSignupErrors({}); }}
                 className="text-blue-600 underline"
               >
                 Login
@@ -436,10 +350,3 @@ export default function AuthModal({ onClose, role }) {
     </div>
   );
 }
-
-/*
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-*/
