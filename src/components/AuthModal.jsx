@@ -85,11 +85,11 @@ export default function AuthModal({ onClose, role }) {
         return;
       }
       // Use backend login for all users
-  const res = await fetch("https://production-project-1.onrender.com/api/auth/login", {
+      const res = await fetch("https://production-project-1.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: loginData.email, password: loginData.password })
+        body: JSON.stringify({ email: loginData.email, password: loginData.password, role })
       });
       const data = await res.json();
       if (!res.ok) {
