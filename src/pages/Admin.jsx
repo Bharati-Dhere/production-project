@@ -6,13 +6,14 @@ import { useAuth } from '../context/AuthContext';
 
 
 const Admin = () => {
-  const { user, isAdmin, login, logout } = useAuth();
+  const { user, login, logout } = useAuth();
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [signupUsers, setSignupUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [feedbacks, setFeedbacks] = useState([]);
   const [error, setError] = useState('');
+  const [loggingIn, setLoggingIn] = useState(false);
   // Product management state
   const [products, setProducts] = useState(() => {
     // Try to load from localStorage for persistence, else use productsData
@@ -45,13 +46,17 @@ const Admin = () => {
     localStorage.setItem('products', JSON.stringify(products));
   }, [products]);
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
-    if (adminEmail === 'admin@example.com' && adminPassword === 'admin123') {
-      login({ email: adminEmail, password: adminPassword });
-      setError('');
+    setLoggingIn(true);
+    setError('');
+    const result = await login({ email: adminEmail, password: adminPassword, role: 'admin' });
+    setLoggingIn(false);
+    if (result && result.success && result.user && result.user.role === 'admin') {
+      // Redirect to dashboard (reload page or use navigation if using react-router)
+      window.location.reload();
     } else {
-      setError('Invalid admin credentials');
+      setError(result && result.message ? result.message : 'Invalid admin credentials');
     }
   };
 
@@ -72,7 +77,7 @@ const Admin = () => {
   };
 
   // Show admin login form if not logged in or not admin
-  if (!user || !isAdmin) {
+  if (!user || user.role !== 'admin') {
     return (
       <div className="max-w-md mx-auto p-6">
         <h2 className="text-2xl font-bold text-center mb-4">Admin Login</h2>
@@ -94,8 +99,8 @@ const Admin = () => {
             required
           />
           {error && <p className="text-red-600">{error}</p>}
-          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded">
-            Login
+          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded" disabled={loggingIn}>
+            {loggingIn ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>

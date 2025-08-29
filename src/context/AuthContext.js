@@ -25,16 +25,28 @@ export const AuthProvider = ({ children }) => {
 	// No localStorage usage for user/session
 
 
-const login = async (userData) => {
-       try {
-		const res = await fetch(`https://production-project-1.onrender.com/api/users/by-email/${encodeURIComponent(userData.email)}`);
-	       const data = await res.json();
-	       if (data && data.data) {
-		       setUser(data.data);
-		       return;
-	       }
-       } catch {}
-       setUser(userData);
+
+const login = async ({ email, password, role }) => {
+	try {
+		const res = await fetch('https://production-project-1.onrender.com/api/auth/login', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include',
+			body: JSON.stringify({ email, password, role })
+		});
+		if (res.ok) {
+			const data = await res.json();
+			if (data && data.user) {
+				setUser(data.user);
+				return { success: true, user: data.user };
+			}
+		} else {
+			const err = await res.json();
+			return { success: false, message: err.message || 'Login failed' };
+		}
+	} catch (e) {
+		return { success: false, message: 'Network error' };
+	}
 };
 
 	const logout = async () => {

@@ -93,6 +93,7 @@ function App() {
             <Route path="/admin/customers" element={<AdminProtectedRoute><AdminLayout><AdminCustomers /></AdminLayout></AdminProtectedRoute>} />
             <Route path="/admin/feedback" element={<AdminProtectedRoute><AdminLayout><AdminFeedback /></AdminLayout></AdminProtectedRoute>} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </Layout>
       </Router>
