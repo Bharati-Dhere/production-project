@@ -184,7 +184,7 @@ export default function AdminDashboard() {
   // Only count active orders (not delivered, not cancelled)
   const orderCount = orders.filter(o => o.status !== 'Cancelled' && o.status !== 'Delivered').length;
   const feedbackCount = feedback.length;
-  const customerCount = userCount; // If customers are different, adjust logic
+  const customerCount = users.filter(u => u.role !== 'admin').length;
 
   return (
     <main className="flex-1 p-6 transition-all duration-500 ease-in-out">
