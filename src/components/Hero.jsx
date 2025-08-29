@@ -21,7 +21,7 @@ const slidesData = {
       title: 'Smart Gadgets & Accessories',
       subtitle: 'Upgrade your life with the latest tech essentials.',
       imgUrl:
-        'https://th.bing.com/th/id/OIP.ygn4alDgL0S57ikHKT3a0QHaDt?w=349&h=174&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
+        'https://image.slidesdocs.com/responsive-images/background/digital-tools-for-productivity-3d-illustration-showcasing-office-equipment-including-laptop-printer-camera-monitor-tablet-pc-mobile-phone-and-headphones-powerpoint-background_faceda0ae4__960_540.jpg',
     },
   ],
   hi: [

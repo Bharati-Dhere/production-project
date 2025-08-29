@@ -48,7 +48,7 @@ export default function AdminDashboard() {
         setProducts(Array.isArray(productsRes) ? productsRes : []);
         setAccessories(Array.isArray(accessoriesRes) ? accessoriesRes : []);
         setOrders(Array.isArray(ordersRes.data?.data) ? ordersRes.data.data : []);
-        setUsers(Array.isArray(usersRes.data?.data) ? usersRes.data.data : []);
+  setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
         setFeedback(Array.isArray(feedbackRes.data?.data) ? feedbackRes.data.data : []);
   // Low stock alert (products + accessories)
   const lowStockProducts = (productsRes || []).filter(p => Number(p.stock) < 5);
