@@ -161,7 +161,7 @@ export default function AuthModal({ onClose, role, forceForgot }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-700 via-blue-500 to-pink-400 bg-opacity-80 z-50 flex items-center justify-center overflow-y-auto">
+  <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center overflow-y-auto">
       <div className="bg-white bg-opacity-95 p-8 rounded-2xl w-full max-w-md relative mx-2 my-8 shadow-2xl flex flex-col items-center border-2 border-purple-200" style={{backdropFilter:'blur(6px)'}}>
         <button
           className={`absolute top-2 right-2 text-xl text-gray-600 hover:text-black ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
