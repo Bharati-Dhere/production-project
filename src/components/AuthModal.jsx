@@ -34,30 +34,18 @@ export default function AuthModal({ onClose, role }) {
     setForgotError("");
   }, [role]);
 
-  // Login handler using backend only
+  // Login handler using AuthContext only
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setLoginErrors({});
-    try {
-      const res = await fetch("https://production-project-1.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: loginData.email, password: loginData.password, role: effectiveRole })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setLoginErrors({ general: data.message || "Invalid credentials" });
-        setLoading(false);
-        return;
-      }
-  login(data.user || { email: loginData.email, role: data.role || effectiveRole });
+    const result = await login({ email: loginData.email, password: loginData.password, role: effectiveRole });
+    if (result && result.success && result.user && result.user.role === effectiveRole) {
       toast.success("Welcome!");
       setLoginErrors({});
       onClose && onClose();
-    } catch (err) {
-      setLoginErrors({ general: err.message || "Login failed." });
+    } else {
+      setLoginErrors({ general: (result && result.message) || "Login failed." });
     }
     setLoading(false);
   };
