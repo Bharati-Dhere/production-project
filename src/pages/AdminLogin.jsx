@@ -17,11 +17,13 @@ export default function AdminLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    const success = await login({ email: form.username, password: form.password, role: "admin" });
-    if (success) {
+    const result = await login({ email: form.username, password: form.password, role: "admin" });
+    if (result && result.success && result.user && result.user.role === "admin") {
+      localStorage.setItem("isAdmin", "true");
       navigate("/admin/dashboard");
     } else {
       setError("Invalid admin credentials or login failed.");
+      localStorage.removeItem("isAdmin");
     }
   };
 
