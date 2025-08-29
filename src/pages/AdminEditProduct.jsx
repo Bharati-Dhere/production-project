@@ -68,7 +68,7 @@ const AdminEditProduct = () => {
     const uploadPromises = filesToAdd.map(async (file) => {
       const formData = new FormData();
       formData.append('image', file);
-      const res = await fetch('/api/products/upload-image', {
+  const res = await fetch('https://production-project-1.onrender.com/api/products/upload-image', {
         method: 'POST',
         body: formData
       });

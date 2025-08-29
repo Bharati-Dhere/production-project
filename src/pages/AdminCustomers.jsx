@@ -12,9 +12,9 @@ export default function AdminCustomers() {
     async function fetchData() {
       try {
         // Use relative API paths for proxy setup
-        const usersRes = await axios.get("/api/users", { withCredentials: true });
+  const usersRes = await axios.get("https://production-project-1.onrender.com/api/users", { withCredentials: true });
         setUsers(Array.isArray(usersRes.data.data) ? usersRes.data.data : []);
-        const ordersRes = await axios.get("/api/admin/orders", { withCredentials: true });
+  const ordersRes = await axios.get("https://production-project-1.onrender.com/api/admin/orders", { withCredentials: true });
         setOrders(Array.isArray(ordersRes.data.data) ? ordersRes.data.data : []);
       } catch (err) {
         setUsers([]);
@@ -35,22 +35,38 @@ export default function AdminCustomers() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Customer Management</h1>
-      <ul className="space-y-2 mb-6">
-        {/* Debug: show raw user data */}
-        {users.length === 0 ? (
-          <li className="text-gray-500">No registered users found.</li>
-        ) : (
-          <>
-            <li className="text-base font-semibold text-blue-700 mb-2">Total Users: {users.length}</li>
-            {users.map((u) => (
+      {/* Users/Customers Section */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold text-green-700 mb-2">Users / Customers</h2>
+        <ul className="space-y-2">
+          {users.filter(u => u.role !== 'admin').length === 0 ? (
+            <li className="text-gray-500">No users/customers found.</li>
+          ) : (
+            users.filter(u => u.role !== 'admin').map((u) => (
               <li key={u._id} className="bg-gray-50 p-4 rounded flex justify-between items-center cursor-pointer hover:bg-blue-50" onClick={() => setSelectedUser(u)}>
                 <span className="font-semibold text-blue-800">{u.name}</span>
                 <span className="text-sm text-gray-500">{u.email}</span>
               </li>
-            ))}
-          </>
-        )}
-      </ul>
+            ))
+          )}
+        </ul>
+      </div>
+      {/* Admin Users Section */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold text-purple-700 mb-2">Admin Users</h2>
+        <ul className="space-y-2">
+          {users.filter(u => u.role === 'admin').length === 0 ? (
+            <li className="text-gray-500">No admin users found.</li>
+          ) : (
+            users.filter(u => u.role === 'admin').map((u) => (
+              <li key={u._id} className="bg-gray-50 p-4 rounded flex justify-between items-center cursor-pointer hover:bg-purple-50" onClick={() => setSelectedUser(u)}>
+                <span className="font-semibold text-purple-800">{u.name}</span>
+                <span className="text-sm text-gray-500">{u.email}</span>
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
       {selectedUser && (
         <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-2">Profile Info</h2>
@@ -80,7 +96,7 @@ export default function AdminCustomers() {
                 try {
                   await axios.delete(`/api/admin/users/${selectedUser._id}`, { withCredentials: true });
                   // Re-fetch users after delete
-                  const usersRes = await axios.get("/api/users", { withCredentials: true });
+                  const usersRes = await axios.get("https://production-project-1.onrender.com/api/users", { withCredentials: true });
                   setUsers(Array.isArray(usersRes.data.data) ? usersRes.data.data : []);
                   setSelectedUser(null);
                 } catch {}
