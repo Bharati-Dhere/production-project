@@ -6,6 +6,12 @@ import { useNavigate } from 'react-router-dom';
 const slidesData = {
   en: [
     {
+      title: 'Smart Gadgets & Accessories',
+      subtitle: 'Upgrade your life with the latest tech essentials.',
+      imgUrl:
+        'https://image.slidesdocs.com/responsive-images/background/digital-tools-for-productivity-3d-illustration-showcasing-office-equipment-including-laptop-printer-camera-monitor-tablet-pc-mobile-phone-and-headphones-powerpoint-background_faceda0ae4__960_540.jpg',
+    },
+    {
       title: 'Exclusive Deals Just For You',
       subtitle: 'Save big on top brands and enjoy fast delivery.',
       imgUrl:
@@ -17,12 +23,7 @@ const slidesData = {
       imgUrl:
         'https://tse4.mm.bing.net/th/id/OIP.w_xCZ2P4qrCd_M7w_mjLZwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3',
     },
-    {
-      title: 'Smart Gadgets & Accessories',
-      subtitle: 'Upgrade your life with the latest tech essentials.',
-      imgUrl:
-        'https://image.slidesdocs.com/responsive-images/background/digital-tools-for-productivity-3d-illustration-showcasing-office-equipment-including-laptop-printer-camera-monitor-tablet-pc-mobile-phone-and-headphones-powerpoint-background_faceda0ae4__960_540.jpg',
-    },
+    
   ],
   hi: [
     {

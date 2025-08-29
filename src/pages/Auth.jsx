@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -7,38 +8,23 @@ const Auth = () => {
   const [message, setMessage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
+  const { login, user } = useAuth();
 
 
-  // Use only context/backend for authentication state
-  // Remove all localStorage usage for user/session
-  // You may want to use useAuth() and backend API here
-  // Minimal working handleSubmit for now (no localStorage)
-  const handleSubmit = (e) => {
+  // Use AuthContext login for user login
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
-    // User login: send role 'user' to backend
-    fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email: form.username, password: form.password, role: 'user' })
-    })
-      .then(async res => {
-        if (!res.ok) {
-          const data = await res.json();
-          setMessage(data.message || 'Login failed');
-          setShowPopup(true);
-          return;
-        }
-        setShowPopup(true);
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
-      })
-      .catch(() => {
-        setMessage('Login failed');
-        setShowPopup(true);
-      });
+    setMessage("");
+    const result = await login({ email: form.username, password: form.password, role: "user" });
+    if (result && result.success && result.user && result.user.role === "user") {
+      setShowPopup(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+    } else {
+      setMessage(result && result.message ? result.message : "Login failed");
+      setShowPopup(true);
+    }
   };
 
   return (
