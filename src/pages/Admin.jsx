@@ -60,10 +60,19 @@ const Admin = () => {
     }
   };
 
-  const handleDeleteUser = (email) => {
-    const updatedUsers = signupUsers.filter(user => user.email !== email);
-    setSignupUsers(updatedUsers);
-    localStorage.setItem('signupUsers', JSON.stringify(updatedUsers));
+  // Delete user from backend and update UI
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    try {
+      const res = await fetch(`https://production-project-1.onrender.com/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete user');
+      setSignupUsers(prev => prev.filter(u => u._id !== userId));
+    } catch (err) {
+      alert('Failed to delete user: ' + (err.message || 'Unknown error'));
+    }
   };
 
   // Add product handler
@@ -186,7 +195,12 @@ const Admin = () => {
                   <td className="p-2">{typeof u.email === 'object' ? JSON.stringify(u.email) : u.email}</td>
                   <td className="p-2">{typeof u.role === 'object' ? JSON.stringify(u.role) : (u.role || 'user')}</td>
                   <td className="p-2">
-                    {/* Optionally implement delete via backend */}
+                    <button
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700"
+                      onClick={() => handleDeleteUser(u._id)}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

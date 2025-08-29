@@ -2,11 +2,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AuthModal from "../components/AuthModal";
 
 export default function AdminLogin() {
   const { login } = useAuth();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -52,7 +54,17 @@ export default function AdminLogin() {
         />
         {error && <div className="text-red-500 mb-6 text-center font-semibold text-base">{error}</div>}
         <button type="submit" className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white py-3 rounded-lg font-bold text-lg shadow-lg hover:from-purple-600 hover:to-purple-800 transition">Login</button>
+        <button
+          type="button"
+          className="w-full text-purple-600 underline text-sm mt-4 hover:text-purple-800"
+          onClick={() => setShowForgotModal(true)}
+        >
+          Forgot password?
+        </button>
       </form>
+      {showForgotModal && (
+        <AuthModal role="admin" onClose={() => setShowForgotModal(false)} />
+      )}
     </div>
   );
 }

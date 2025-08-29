@@ -108,12 +108,14 @@ export default function AdminCustomers() {
             <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onClick={async () => {
               if(window.confirm('Are you sure you want to delete this user?')) {
                 try {
-                  await axios.delete(`/api/admin/users/${selectedUser._id}`, { withCredentials: true });
+                  await axios.delete(`https://production-project-1.onrender.com/api/admin/users/${selectedUser._id}`, { withCredentials: true });
                   // Re-fetch users after delete
                   const usersRes = await axios.get("https://production-project-1.onrender.com/api/users", { withCredentials: true });
                   setUsers(Array.isArray(usersRes.data.data) ? usersRes.data.data : []);
                   setSelectedUser(null);
-                } catch {}
+                } catch (err) {
+                  window.alert('Failed to delete user: ' + (err?.response?.data?.message || err.message || 'Unknown error'));
+                }
               }
             }}>Delete User</button>
           </div>

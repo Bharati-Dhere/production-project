@@ -1,3 +1,38 @@
+// --- USER FORGOT PASSWORD FLOW ---
+const userForgotCodes = {};
+
+// Send verification code for user forgot password
+router.post('/forgot-password/send-code', async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email, role: 'user' });
+  if (!user) {
+    // Do not reveal if email exists
+    return res.json({ message: 'If your email is registered, you will receive a reset code.' });
+  }
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  userForgotCodes[email] = { code, expires: Date.now() + 10 * 60 * 1000 };
+  await sendMail({
+    to: email,
+    subject: 'Your Password Reset Verification Code',
+    text: `Your verification code is: ${code}`,
+    html: `<p>Your verification code is: <b>${code}</b></p>`
+  });
+  res.json({ message: 'Verification code sent to email.' });
+});
+
+// Verify code and set new password for user
+router.post('/forgot-password/verify', async (req, res) => {
+  const { email, password, code } = req.body;
+  if (!userForgotCodes[email] || userForgotCodes[email].code !== code || userForgotCodes[email].expires < Date.now()) {
+    return res.status(400).json({ message: 'Invalid or expired verification code.' });
+  }
+  delete userForgotCodes[email];
+  const user = await User.findOne({ email, role: 'user' });
+  if (!user) return res.status(400).json({ message: 'User not found.' });
+  user.password = await bcrypt.hash(password, 10);
+  await user.save();
+  res.json({ message: 'Password reset successful.' });
+});
 
 const express = require('express');
 const bcrypt = require('bcryptjs');

@@ -140,7 +140,11 @@ export default function AuthModal({ onClose, role }) {
       return;
     }
     try {
-      const res = await fetch("https://production-project-1.onrender.com/api/auth/admin-forgot-password/send-code", {
+      // Use admin endpoint for admin, user endpoint for user
+      const endpoint = (role === 'admin')
+        ? "https://production-project-1.onrender.com/api/auth/admin-forgot-password/send-code"
+        : "https://production-project-1.onrender.com/api/auth/forgot-password/send-code";
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: forgotEmail })
