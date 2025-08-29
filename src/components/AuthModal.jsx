@@ -5,18 +5,18 @@ import { FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 // role is now passed as a prop, not managed in modal
-export default function AuthModal({ onClose, role }) {
+export default function AuthModal({ onClose, role, forceForgot }) {
   // Default role to 'user' if not provided
   const effectiveRole = role || 'user';
   const { login } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(forceForgot ? false : true);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ email: "", password: "", confirmPassword: "" });
   const [signupStep, setSignupStep] = useState(0); // 0: form, 1: verify email, 2: complete
   const [signupVerificationCode, setSignupVerificationCode] = useState("");
   const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotStep, setForgotStep] = useState(0); // 0: not open, 1: enter email, 2: check email
+  const [forgotStep, setForgotStep] = useState(forceForgot ? 1 : 0); // 0: not open, 1: enter email, 2: check email
   const [loginErrors, setLoginErrors] = useState({});
   const [signupErrors, setSignupErrors] = useState({});
   const [forgotError, setForgotError] = useState("");
@@ -28,11 +28,11 @@ export default function AuthModal({ onClose, role }) {
     setSignupStep(0);
     setSignupVerificationCode("");
     setForgotEmail("");
-    setForgotStep(0);
+    setForgotStep(forceForgot ? 1 : 0);
     setLoginErrors({});
     setSignupErrors({});
     setForgotError("");
-  }, [role]);
+  }, [role, forceForgot]);
 
   // Login handler using AuthContext only
   const handleLogin = async (e) => {
@@ -140,10 +140,8 @@ export default function AuthModal({ onClose, role }) {
       return;
     }
     try {
-      // Use admin endpoint for admin, user endpoint for user
-      const endpoint = (role === 'admin')
-        ? "https://production-project-1.onrender.com/api/auth/admin-forgot-password/send-code"
-        : "https://production-project-1.onrender.com/api/auth/forgot-password/send-code";
+      // Always use the same endpoint for all users (user or admin)
+      const endpoint = "https://production-project-1.onrender.com/api/auth/forgot-password/send-code";
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -163,8 +161,8 @@ export default function AuthModal({ onClose, role }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto">
-      <div className="bg-white p-6 rounded-lg w-full max-w-xs sm:max-w-md relative mx-2 my-8 shadow-xl flex flex-col items-center">
+    <div className="fixed inset-0 bg-gradient-to-br from-purple-700 via-blue-500 to-pink-400 bg-opacity-80 z-50 flex items-center justify-center overflow-y-auto">
+      <div className="bg-white bg-opacity-95 p-8 rounded-2xl w-full max-w-md relative mx-2 my-8 shadow-2xl flex flex-col items-center border-2 border-purple-200" style={{backdropFilter:'blur(6px)'}}>
         <button
           className={`absolute top-2 right-2 text-xl text-gray-600 hover:text-black ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={() => { if (!loading) onClose && onClose(); }}
@@ -172,12 +170,12 @@ export default function AuthModal({ onClose, role }) {
         >
           <FaTimes />
         </button>
-        <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-center">
+  <h2 className="text-2xl font-extrabold mb-6 text-center text-purple-700 tracking-wide drop-shadow">
           {forgotStep ? "Forgot Password" : isLogin ? "Login" : "Sign Up"}
         </h2>
 
         {forgotStep === 1 && showPasswordReset ? (
-          <div>
+          <div className="w-full flex flex-col items-center">
             <PasswordResetModal
               showModal={showPasswordReset}
               setShowModal={setShowPasswordReset}
@@ -193,20 +191,20 @@ export default function AuthModal({ onClose, role }) {
             />
             <button
               type="button"
-              className="w-full mt-2 text-gray-600 underline"
+              className="w-full mt-4 text-purple-600 underline font-semibold text-base hover:text-purple-800"
               onClick={() => { setForgotStep(0); setForgotEmail(""); setForgotError(""); setShowPasswordReset(false); setIsLogin(true); }}
             >
-              Back to Login
+              ← Back to Login
             </button>
           </div>
         ) : forgotStep === 2 ? (
-          <div className="w-full text-center">
-            <p className="text-green-700 mb-4">Check your email for a password reset code.</p>
+          <div className="w-full text-center flex flex-col items-center">
+            <p className="text-green-700 mb-6 text-lg font-semibold">Check your email for a password reset code.</p>
             <button
-              className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200 text-base sm:text-sm"
+              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white p-2 rounded-lg font-bold hover:from-purple-600 hover:to-blue-600 transition text-base sm:text-sm shadow"
               onClick={() => { setForgotStep(0); setForgotEmail(""); setForgotError(""); setIsLogin(true); }}
             >
-              Back to Login
+              ← Back to Login
             </button>
           </div>
         ) : isLogin ? (

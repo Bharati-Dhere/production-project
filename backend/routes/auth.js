@@ -1,16 +1,16 @@
-// --- USER FORGOT PASSWORD FLOW ---
-const userForgotCodes = {};
+// --- FORGOT PASSWORD FLOW FOR ANY USER (user or admin) ---
+const forgotCodes = {};
 
-// Send verification code for user forgot password
+// Send verification code for forgot password (any user)
 router.post('/forgot-password/send-code', async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email, role: 'user' });
+  const user = await User.findOne({ email });
   if (!user) {
     // Do not reveal if email exists
     return res.json({ message: 'If your email is registered, you will receive a reset code.' });
   }
   const code = Math.floor(100000 + Math.random() * 900000).toString();
-  userForgotCodes[email] = { code, expires: Date.now() + 10 * 60 * 1000 };
+  forgotCodes[email] = { code, expires: Date.now() + 10 * 60 * 1000 };
   await sendMail({
     to: email,
     subject: 'Your Password Reset Verification Code',
@@ -20,14 +20,14 @@ router.post('/forgot-password/send-code', async (req, res) => {
   res.json({ message: 'Verification code sent to email.' });
 });
 
-// Verify code and set new password for user
+// Verify code and set new password for any user
 router.post('/forgot-password/verify', async (req, res) => {
   const { email, password, code } = req.body;
-  if (!userForgotCodes[email] || userForgotCodes[email].code !== code || userForgotCodes[email].expires < Date.now()) {
+  if (!forgotCodes[email] || forgotCodes[email].code !== code || forgotCodes[email].expires < Date.now()) {
     return res.status(400).json({ message: 'Invalid or expired verification code.' });
   }
-  delete userForgotCodes[email];
-  const user = await User.findOne({ email, role: 'user' });
+  delete forgotCodes[email];
+  const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ message: 'User not found.' });
   user.password = await bcrypt.hash(password, 10);
   await user.save();

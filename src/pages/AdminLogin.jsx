@@ -9,6 +9,7 @@ export default function AdminLogin() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forceForgot, setForceForgot] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -57,13 +58,13 @@ export default function AdminLogin() {
         <button
           type="button"
           className="w-full text-purple-600 underline text-sm mt-4 hover:text-purple-800"
-          onClick={() => setShowForgotModal(true)}
+          onClick={() => { setShowForgotModal(true); setForceForgot(true); }}
         >
           Forgot password?
         </button>
       </form>
       {showForgotModal && (
-        <AuthModal role="admin" onClose={() => setShowForgotModal(false)} />
+        <AuthModal role="admin" onClose={() => { setShowForgotModal(false); setForceForgot(false); }} forceForgot={forceForgot} />
       )}
     </div>
   );
