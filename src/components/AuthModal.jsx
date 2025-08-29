@@ -239,7 +239,7 @@ export default function AuthModal({ onClose, role, forceForgot }) {
               <button
                 type="button"
                 className="w-full text-blue-600 underline text-sm mt-2"
-                oonClick={() => { setShowForgotModal(true); setForceForgot(true); }}
+                onClick={() => { setForgotStep(1); setForgotEmail(""); setForgotError(""); setShowPasswordReset(true); }}
               >
                 Forgot password?
               </button>
@@ -339,9 +339,6 @@ export default function AuthModal({ onClose, role, forceForgot }) {
           </button>
         </div>
       </div>
-      {showForgotModal && (
-              <AuthModal role="admin" onClose={() => { setShowForgotModal(false); setForceForgot(false); }} forceForgot={forceForgot} />
-            )}
     </div>
   );
 }
