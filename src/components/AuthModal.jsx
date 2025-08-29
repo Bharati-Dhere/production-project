@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 
 // role is now passed as a prop, not managed in modal
 export default function AuthModal({ onClose, role }) {
+  // Default role to 'user' if not provided
+  const effectiveRole = role || 'user';
   const { login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -42,7 +44,7 @@ export default function AuthModal({ onClose, role }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: loginData.email, password: loginData.password, role })
+        body: JSON.stringify({ email: loginData.email, password: loginData.password, role: effectiveRole })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -50,7 +52,7 @@ export default function AuthModal({ onClose, role }) {
         setLoading(false);
         return;
       }
-      login(data.user || { email: loginData.email, role: data.role || role });
+  login(data.user || { email: loginData.email, role: data.role || effectiveRole });
       toast.success("Welcome!");
       setLoginErrors({});
       onClose && onClose();
