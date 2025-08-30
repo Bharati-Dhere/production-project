@@ -1,4 +1,3 @@
-
 import AdminPanel from "./pages/AdminPanel";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -35,6 +34,7 @@ import AdminAddProduct from "./pages/AdminAddProduct";
 import AdminEditProduct from "./pages/AdminEditProduct";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import VoiceBot from "./components/VoiceBot";
 
 function AdminProtectedRoute({ children }) {
   const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -95,6 +95,7 @@ function App() {
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
+          <VoiceBot />
         </Layout>
       </Router>
     </div>
