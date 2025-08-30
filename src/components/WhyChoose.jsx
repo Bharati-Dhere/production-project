@@ -48,33 +48,18 @@ const features = [
 const WhyChooseUs = () => {
   return (
     <section
-      className="max-w-7xl mx-auto px-4 py-16"
-      style={{
-        background: 'rgba(10, 24, 61, 0.55)',
-        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderRadius: '24px',
-        border: '1.5px solid rgba(255, 255, 255, 0.18)',
-      }}
+      className="max-w-7xl mx-auto px-4 py-16 bg-gray-50 rounded-3xl"
     >
-      <h2 className="text-3xl font-bold mb-12 text-center text-white">Why Choose Us</h2>
+      <h2 className="text-3xl font-bold mb-12 text-center text-gray-800">Why Choose Us</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
         {features.map(({ id, title, description, icon }) => (
           <div
             key={id}
-            className="flex flex-col items-center text-center p-6 rounded-xl transition transform hover:scale-105 hover:shadow-xl"
-            style={{
-              background: 'rgba(0, 123, 255, 0.15)', // Transparent blue
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: 'inset 0 0 10px rgba(0, 123, 255, 0.05)',
-            }}
+            className="flex flex-col items-center text-center p-6 rounded-xl bg-white shadow transition transform hover:scale-105 hover:shadow-xl"
           >
             <div className="mb-4">{icon}</div>
-            <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
-            <p className="text-blue-100">{description}</p>
+            <h3 className="text-xl font-semibold mb-2 text-gray-900">{title}</h3>
+            <p className="text-gray-600">{description}</p>
           </div>
         ))}
       </div>
