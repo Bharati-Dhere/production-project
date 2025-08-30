@@ -75,6 +75,21 @@ const Products = () => {
   }, [user]);
 
   useEffect(() => {
+    // Clear all filters on mount so new products always show
+    setFilters({
+      category: [],
+      brand: [],
+      price: { min: 0, max: 150000 },
+      rating: null,
+      offer: [],
+      bestSeller: [],
+      color: [],
+      size: [],
+      inStock: false
+    });
+  }, []);
+
+  useEffect(() => {
     let result = [...products];
     if (filters.category.length)
       result = result.filter(p => filters.category.includes(p.category));

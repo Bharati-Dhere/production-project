@@ -47,6 +47,20 @@ export default function Accessories() {
   }, []);
 
   useEffect(() => {
+    // Clear all filters on mount so new accessories always show
+    setFilters({
+      category: [],
+      brand: [],
+      color: [],
+      offer: [],
+      bestSeller: [],
+      price: { min: 0, max: 5000 },
+      rating: null,
+      inStock: false,
+    });
+  }, []);
+
+  useEffect(() => {
     const safeAccessories = Array.isArray(accessories) ? accessories : [];
     let result = [...safeAccessories];
     if (filters.category.length)
