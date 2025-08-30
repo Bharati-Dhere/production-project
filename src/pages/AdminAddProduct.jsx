@@ -1,9 +1,18 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { addProduct, addAccessory } from "../utils/api";
 
 const AdminAddProduct = () => {
-  const [productType, setProductType] = useState("Product");
+  const location = useLocation();
+  // Get ?type=Accessory or ?type=Product from query string
+  const queryType = new URLSearchParams(location.search).get("type");
+  const [productType, setProductType] = useState(queryType === "Accessory" ? "Accessory" : "Product");
+
+  useEffect(() => {
+    if (queryType && (queryType === "Accessory" || queryType === "Product")) {
+      setProductType(queryType);
+    }
+  }, [queryType]);
   const [product, setProduct] = useState({
     name: "",
     price: "",

@@ -129,7 +129,18 @@ const AdminExistingProducts = () => {
             <option value="Product">Products</option>
             <option value="Accessory">Accessories</option>
           </select>
-          <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={() => navigate("/admin/add-product")}>Add New {type}</button>
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded"
+            onClick={() => {
+              if (type === "Accessory") {
+                navigate("/admin/add-product?type=Accessory");
+              } else {
+                navigate("/admin/add-product?type=Product");
+              }
+            }}
+          >
+            Add New {type}
+          </button>
         </div>
       </div>
       <div className="overflow-x-auto">
