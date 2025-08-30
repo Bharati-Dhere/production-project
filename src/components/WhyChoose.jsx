@@ -47,7 +47,7 @@ const features = [
 
 const WhyChooseUs = () => {
   return (
-    <section className="max-w-7xl mx-auto px-4 py-16 bg-gray-50">
+    <section className="max-w-7xl mx-auto px-4 py-16" style={{ background: 'rgba(173, 216, 230, 0.45)' }}>
       <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Us</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
         {features.map(({ id, title, description, icon }) => (
