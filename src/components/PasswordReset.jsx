@@ -1,10 +1,7 @@
 // PasswordResetModal.jsx
-import React from 'react';
-// import { useClerk, useSignIn } from "@clerk/clerk-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function PasswordResetModal({ showModal, setShowModal }) {
-  // Clerk logic removed; only backend endpoints are used
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -68,7 +65,7 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
       const response = await fetch("/api/auth/forgot-password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code, password: password || undefined }), // password only if step 3
+        body: JSON.stringify({ email, code, password: password || undefined }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -94,7 +91,6 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     setLoading(true);
     setMessage("");
     try {
-      // Use the same verify endpoint, but now with password
       const response = await fetch("/api/auth/forgot-password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -115,13 +111,12 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
   };
 
   // Render modal UI
-  // Only one return at the end of the function
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
         <button
           onClick={() => setShowModal(false)}
-          className={`absolute top-2 right-3 text-xl`}
+          className="absolute top-2 right-3 text-xl"
         >
           ✕
         </button>
@@ -176,7 +171,9 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
         )}
 
         {step === 4 && (
-          <p className="text-green-600 text-center"> Password updated! Redirecting...</p>
+          <p className="text-green-600 text-center">
+            Password updated! Redirecting...
+          </p>
         )}
       </div>
     </div>
