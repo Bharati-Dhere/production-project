@@ -20,16 +20,32 @@ const commandMap = [
   { phrases: ["orders", "my orders", "order history", "ऑर्डर", "माझी ऑर्डर", "ऑर्डर इतिहास"], path: "/orders" },
   { phrases: ["track order", "track my order", "ऑर्डर ट्रैक करें", "ऑर्डर ट्रॅक करा"], path: "/track-order" },
   { phrases: ["apply filter", "filter products", "फिल्टर लगाएं", "फिल्टर करा"], action: "filter" },
-  // Admin side (use correct admin routes)
+  // Admin side (expanded for natural language)
   { phrases: ["admin login", "open admin login", "एडमिन लॉगिन"], path: "/admin/login" },
-  { phrases: ["admin dashboard", "open admin dashboard", "एडमिन डॅशबोर्ड"], path: "/admin/dashboard" },
-  { phrases: ["admin products", "open admin products", "एडमिन उत्पाद"], path: "/admin/products" },
-  { phrases: ["admin orders", "open admin orders", "एडमिन ऑर्डर"], path: "/admin/orders" },
-  { phrases: ["admin customers", "open admin customers", "एडमिन ग्राहक", "customer details", "open customer details"], path: "/admin/customers" },
-  { phrases: ["admin feedback", "open admin feedback", "एडमिन फीडबॅक"], path: "/admin/feedback" },
-  { phrases: ["admin add product", "add admin product", "एडमिन उत्पाद जोडा"], path: "/admin/add-product" },
-  { phrases: ["admin edit product", "edit admin product", "एडमिन उत्पाद संपादित करा"], path: "/admin/edit-product" },
-  { phrases: ["admin existing products", "existing admin products", "एडमिन विद्यमान उत्पाद"], path: "/admin/existing-products" },
+  { phrases: [
+    "admin dashboard", "open admin dashboard", "dashboard", "dashboard page", "एडमिन डॅशबोर्ड", "डॅशबोर्ड", "डॅशबोर्ड पेज"
+  ], path: "/admin/dashboard" },
+  { phrases: [
+    "admin products", "open admin products", "show products", "products", "products page", "existing products", "existing product", "एडमिन उत्पाद", "उत्पाद", "उत्पाद पेज", "उत्पाद दाखवा", "उत्पादने", "products उघडा", "products दाखवा"
+  ], path: "/admin/products" },
+  { phrases: [
+    "admin orders", "open admin orders", "orders", "orders page", "order page", "order", "ऑर्डर", "ऑर्डर पेज", "ऑर्डर उघडा", "ऑर्डर दाखवा", "एडमिन ऑर्डर"
+  ], path: "/admin/orders" },
+  { phrases: [
+    "admin customers", "open admin customers", "customers", "customer", "customer details", "customers page", "ग्राहक", "ग्राहक पेज", "ग्राहक उघडा", "ग्राहक दाखवा", "एडमिन ग्राहक"
+  ], path: "/admin/customers" },
+  { phrases: [
+    "admin feedback", "open admin feedback", "feedback", "feedback page", "फीडबॅक", "फीडबॅक पेज", "फीडबॅक उघडा", "फीडबॅक दाखवा", "एडमिन फीडबॅक"
+  ], path: "/admin/feedback" },
+  { phrases: [
+    "admin add product", "add admin product", "add product", "add products", "add products page", "add product page", "उत्पाद जोडा", "उत्पाद जोडा पेज", "एडमिन उत्पाद जोडा"
+  ], path: "/admin/add-product" },
+  { phrases: [
+    "admin edit product", "edit admin product", "edit product", "edit products", "उत्पाद संपादित करा", "एडमिन उत्पाद संपादित करा"
+  ], path: "/admin/edit-product" },
+  { phrases: [
+    "admin existing products", "existing admin products", "existing products", "existing product", "विद्यमान उत्पाद", "एडमिन विद्यमान उत्पाद"
+  ], path: "/admin/existing-products" },
   // Add more as needed
 ];
 
