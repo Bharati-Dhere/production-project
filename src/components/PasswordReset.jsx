@@ -1,139 +1,10 @@
 // PasswordResetModal.jsx
 import React from 'react';
-import { useClerk, useSignIn } from "@clerk/clerk-react";
+// import { useClerk, useSignIn } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 
-export default function PasswordResetModal({ showModal, setShowModal }) {
-  const { signIn } = useSignIn();
-  const { signOut, session } = useClerk();
-  const [step, setStep] = useState(1);
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  // Reset all state when modal is opened or closed
-  useEffect(() => {
-    if (showModal) {
-      setStep(1);
-      setEmail("");
-      setCode("");
-      setPassword("");
-      setMessage("");
-      setLoading(false);
-    }
-  }, [showModal]);
-
-  // Auto-close only after password reset success
-  useEffect(() => {
-    if (step === 4 && showModal) {
-      const timer = setTimeout(() => {
-        setShowModal(false);
-      }, 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [step, setShowModal, showModal]);
-
-  //  Step 1: Send email code
-  const handleSendCode = async () => {
-    setLoading(true);
-    setMessage("");
-
-    try {
-      // Always sign out before starting a new signIn to avoid 'session already exists' error
-      if (typeof signOut === 'function') await signOut();
-      if (signIn && signIn.reset) signIn.reset();
-      await signIn.create({
-        identifier: email,
-        strategy: "email_code",
-      });
-
-      setStep(2);
-      setMessage(" Verification code sent to your email.");
-    } catch (err) {
-      // If error is 'session_exists', force signOut and reset, then retry once
-      if (err.errors && err.errors[0]?.code === 'session_exists') {
-        try {
-          if (typeof signOut === 'function') await signOut();
-          if (signIn && signIn.reset) signIn.reset();
-          await signIn.create({
-            identifier: email,
-            strategy: "email_code",
-          });
-          setStep(2);
-          setMessage(" Verification code sent to your email.");
-          setLoading(false);
-          return;
-        } catch (err2) {
-          setMessage(err2.errors?.[0]?.message || err2.message || "Error sending code.");
-          setStep(1); // Always show email entry if error
-          setLoading(false);
-          return;
-        }
-      }
-      setMessage(err.errors?.[0]?.message || "Error sending code.");
-      setStep(1); // Always show email entry if error
-    }
-
-    setLoading(false);
-  };
-
-  // ✅ Step 2: Verify Code
-  const handleVerifyCode = async () => {
-    setLoading(true);
-    setMessage("");
-
-    try {
-      await signIn.attemptFirstFactor({
-        strategy: "email_code",
-        code,
-      });
-
-      setStep(3); // Go to set new password
-      setMessage(" Code verified. Set your new password.");
-    } catch (err) {
-      setMessage(err.errors?.[0]?.message || "Invalid code.");
-    }
-
-    setLoading(false);
-  };
-
-  // ✅ Step 3: Set new password
-  const handleSetPassword = async () => {
-  setLoading(true);
-  setMessage("");
-
-  try {
-    const response = await fetch("/api/set-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, verified: true }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      // Show a specific error if user not found
-      if (response.status === 404 && data.message && data.message.toLowerCase().includes("not found")) {
-        setMessage("No account found with this email.");
-      } else {
-        setMessage(data.message || "Server error");
-      }
-      setLoading(false);
-      return;
-    }
-
-    setStep(4);
-    setMessage("Password updated successfully.");
-  } catch (err) {
-    setMessage(err.message || "Error setting password.");
-  }
-
-  setLoading(false);
-};
-
-
+  // Clerk logic removed; only backend endpoints are used
+  // Render modal UI
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
@@ -199,4 +70,111 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
       </div>
     </div>
   );
-}
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Reset all state when modal is opened or closed
+  useEffect(() => {
+    if (showModal) {
+      setStep(1);
+      setEmail("");
+      setCode("");
+      setPassword("");
+      setMessage("");
+      setLoading(false);
+    }
+  }, [showModal]);
+
+  // Auto-close only after password reset success
+  useEffect(() => {
+    if (step === 4 && showModal) {
+      const timer = setTimeout(() => {
+        setShowModal(false);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [step, setShowModal, showModal]);
+
+    // Step 1: Send email code
+    const handleSendCode = async () => {
+      setLoading(true);
+      setMessage("");
+      try {
+        const response = await fetch("/api/auth/forgot-password/send-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setMessage(data.message || "Error sending code.");
+          setStep(1);
+          setLoading(false);
+          return;
+        }
+        setStep(2);
+        setMessage("Verification code sent to your email.");
+      } catch (err) {
+        setMessage(err.message || "Error sending code.");
+        setStep(1);
+      }
+      setLoading(false);
+    };
+
+  // ✅ Step 2: Verify Code
+  const handleVerifyCode = async () => {
+    setLoading(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/auth/forgot-password/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code, password: password || undefined }), // password only if step 3
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.message || "Invalid or expired code.");
+        setLoading(false);
+        return;
+      }
+      if (step === 2) {
+        setStep(3);
+        setMessage("Code verified. Set your new password.");
+      } else {
+        setStep(4);
+        setMessage("Password updated successfully.");
+      }
+    } catch (err) {
+      setMessage(err.message || "Invalid code.");
+    }
+    setLoading(false);
+  };
+
+  // ✅ Step 3: Set new password
+  const handleSetPassword = async () => {
+    setLoading(true);
+    setMessage("");
+    try {
+      // Use the same verify endpoint, but now with password
+      const response = await fetch("/api/auth/forgot-password/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code, password }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.message || "Error setting password.");
+        setLoading(false);
+        return;
+      }
+      setStep(4);
+      setMessage("Password updated successfully.");
+    } catch (err) {
+      setMessage(err.message || "Error setting password.");
+    }
+    setLoading(false);
+  };
