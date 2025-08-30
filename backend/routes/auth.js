@@ -1,8 +1,12 @@
 
 const express = require('express');
+const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const admin = require('firebase-admin');
+const { sendMail } = require('../controllers/mailer');
+const crypto = require('crypto');
 // --- FORGOT PASSWORD FLOW FOR ANY USER (user or admin) ---
 const forgotCodes = {};
 
@@ -39,14 +43,9 @@ router.post('/forgot-password/verify', async (req, res) => {
   res.json({ message: 'Password reset successful.' });
 });
 
-const router = express.Router();
-const admin = require('firebase-admin');
-
 
 // Firebase email verification code flow
 const verificationCodes = {};
-const { sendMail } = require('../controllers/mailer');
-const crypto = require('crypto');
 
 // Send verification code for signup
 router.post('/signup/send-code', async (req, res) => {
