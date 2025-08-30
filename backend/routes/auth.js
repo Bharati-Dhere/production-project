@@ -1,3 +1,8 @@
+
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 // --- FORGOT PASSWORD FLOW FOR ANY USER (user or admin) ---
 const forgotCodes = {};
 
@@ -34,10 +39,6 @@ router.post('/forgot-password/verify', async (req, res) => {
   res.json({ message: 'Password reset successful.' });
 });
 
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 const router = express.Router();
 const admin = require('firebase-admin');
 
