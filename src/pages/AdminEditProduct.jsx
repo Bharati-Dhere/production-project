@@ -109,6 +109,8 @@ const AdminEditProduct = () => {
       } else {
         await updateAccessory(product._id || product.id, updatedProduct);
       }
+      // Dispatch event for user side update
+      window.dispatchEvent(new Event('productAccessoryUpdated'));
       navigate("/admin/existing-products");
     } catch (err) {
       alert("Error saving changes. Please try again.");
