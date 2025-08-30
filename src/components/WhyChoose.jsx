@@ -6,7 +6,7 @@ const features = [
     title: 'Free Shipping',
     description: 'On all orders over $50 with fast delivery.',
     icon: (
-      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" >
+      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M5 6h14l1 7H4l1-7zM7 16a2 2 0 11-4 0 2 2 0 014 0zm14 0a2 2 0 11-4 0 2 2 0 014 0z" />
       </svg>
     ),
@@ -58,13 +58,23 @@ const WhyChooseUs = () => {
         border: '1.5px solid rgba(255, 255, 255, 0.18)',
       }}
     >
-      <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Us</h2>
+      <h2 className="text-3xl font-bold mb-12 text-center text-white">Why Choose Us</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
         {features.map(({ id, title, description, icon }) => (
-          <div key={id} className="flex flex-col items-center text-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+          <div
+            key={id}
+            className="flex flex-col items-center text-center p-6 rounded-xl transition transform hover:scale-105 hover:shadow-xl"
+            style={{
+              background: 'rgba(0, 123, 255, 0.15)', // Transparent blue
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: 'inset 0 0 10px rgba(0, 123, 255, 0.05)',
+            }}
+          >
             <div className="mb-4">{icon}</div>
-            <h3 className="text-xl font-semibold mb-2">{title}</h3>
-            <p className="text-gray-600">{description}</p>
+            <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
+            <p className="text-blue-100">{description}</p>
           </div>
         ))}
       </div>
