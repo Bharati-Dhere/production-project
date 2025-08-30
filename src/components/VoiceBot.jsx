@@ -1,5 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { AuthContext } from "../context/AuthContext";
 
 // Expanded command map for VoiceBot
 // Add these to VoiceBot.jsx, replacing the old commandMap
@@ -54,6 +56,7 @@ const VoiceBot = () => {
   const recognitionRef = useRef(null);
   const [listening, setListening] = useState(false);
   const [error, setError] = useState("");
+  const { user } = useContext(AuthContext) || {};
 
   // Start/stop speech recognition
   const toggleListening = () => {
@@ -74,7 +77,16 @@ const VoiceBot = () => {
         for (const cmd of commandMap) {
           if (cmd.phrases.some(p => transcript.includes(p))) {
             if (cmd.path) {
-              navigate(cmd.path);
+              // Restrict admin pages to admin users only
+              if (cmd.path.startsWith("/admin")) {
+                if (user && user.role === "admin") {
+                  navigate(cmd.path);
+                } else {
+                  setError("You must be logged in as admin to access this page.");
+                }
+              } else {
+                navigate(cmd.path);
+              }
             } else if (cmd.action) {
               // Handle actions like login, signup, forgot password, filter
               switch (cmd.action) {
