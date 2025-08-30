@@ -114,7 +114,14 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Server error");
+      // Show a specific error if user not found
+      if (response.status === 404 && data.message && data.message.toLowerCase().includes("not found")) {
+        setMessage("No account found with this email.");
+      } else {
+        setMessage(data.message || "Server error");
+      }
+      setLoading(false);
+      return;
     }
 
     setStep(4);
