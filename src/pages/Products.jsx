@@ -64,11 +64,13 @@ const Products = () => {
     // Listen for updates from other components
     const handler = () => fetchProductsAndUserData();
     window.addEventListener('cartWishlistUpdated', handler);
-    // Listen for review submissions to auto-refresh products
+    // Listen for review submissions and admin updates to auto-refresh products
     window.addEventListener('reviewSubmitted', handler);
+    window.addEventListener('productAccessoryUpdated', handler);
     return () => {
       window.removeEventListener('cartWishlistUpdated', handler);
       window.removeEventListener('reviewSubmitted', handler);
+      window.removeEventListener('productAccessoryUpdated', handler);
     };
   }, [user]);
 

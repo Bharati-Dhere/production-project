@@ -170,7 +170,7 @@ export default function AuthModal({ onClose, role, forceForgot }) {
         >
           <FaTimes />
         </button>
-  <h2 className="text-2xl font-extrabold mb-6 text-center text-purple-700 tracking-wide drop-shadow">
+  <h2 className="text-2xl font-extrabold mb-6 text-center bg-blue-600 tracking-wide drop-shadow">
           {forgotStep ? "Forgot Password" : isLogin ? "Login" : "Sign Up"}
         </h2>
 

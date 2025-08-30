@@ -113,6 +113,8 @@ const AdminAddProduct = () => {
         };
         await addAccessory(accessoryData);
       }
+      // Dispatch event for user side update
+      window.dispatchEvent(new Event('productAccessoryUpdated'));
       navigate("/admin/existing-products");
     } catch (err) {
       alert("Error adding item. Please try again.");

@@ -37,9 +37,13 @@ export default function Accessories() {
       });
     };
     fetchAll();
-    // Listen for review submissions to auto-refresh accessories list
+    // Listen for review submissions and admin updates to auto-refresh accessories list
     window.addEventListener('reviewSubmitted', fetchAll);
-    return () => window.removeEventListener('reviewSubmitted', fetchAll);
+    window.addEventListener('productAccessoryUpdated', fetchAll);
+    return () => {
+      window.removeEventListener('reviewSubmitted', fetchAll);
+      window.removeEventListener('productAccessoryUpdated', fetchAll);
+    };
   }, []);
 
   useEffect(() => {
