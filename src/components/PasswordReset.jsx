@@ -1,3 +1,6 @@
+
+// Use your direct backend URL here:
+const BACKEND_URL = "https://production-project-1.onrender.com";
 // PasswordResetModal.jsx
 import React, { useState, useEffect } from "react";
 
@@ -36,7 +39,7 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch("/api/auth/forgot-password/send-code", {
+  const response = await fetch("https://production-project-1.onrender.com/api/auth/forgot-password/send-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -62,7 +65,7 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch("/api/auth/forgot-password/verify", {
+  const response = await fetch("https://production-project-1.onrender.com/api/auth/forgot-password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code, password: password || undefined }),
@@ -91,7 +94,7 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch("/api/auth/forgot-password/verify", {
+  const response = await fetch("https://production-project-1.onrender.com/api/auth/forgot-password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code, password }),
