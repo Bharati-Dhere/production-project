@@ -81,13 +81,19 @@ const AdminAddProduct = () => {
       price: Number(product.price),
       isOffer: !!product.offer,
       isBestSeller: !!product.bestSeller,
-      offerPrice: product.offer ? Number(product.offerPrice) : undefined,
-      discountPercent: product.offer ? Number(product.discountPercent) : undefined,
+      offerPrice: product.offer ? Number(product.offerPrice) : 0,
+      discountPercent: product.offer ? Number(product.discountPercent) : 0,
       freeDelivery: !!product.freeDelivery,
       deliveryPrice: product.freeDelivery ? 0 : Number(product.deliveryPrice),
-      inStock: !!product.inStock,
-      images: product.images || [],
-      image: (product.images && product.images.length > 0) ? product.images[0] : ""
+      inStock: product.inStock !== undefined ? !!product.inStock : true,
+      images: Array.isArray(product.images) ? product.images : ((product.image ? [product.image] : [])),
+      image: (product.images && product.images.length > 0) ? product.images[0] : (product.image || ""),
+      category: product.category || "Other",
+      brand: product.brand || "Other",
+      color: product.color || "Other",
+      stock: product.stock !== undefined ? Number(product.stock) : 10,
+      description: product.description || "",
+      tags: product.tags || ""
     };
     try {
       if (productType === "Product") {
@@ -96,20 +102,21 @@ const AdminAddProduct = () => {
         const accessoryData = {
           name: product.name,
           price: Number(product.price),
-          image: (product.images && product.images.length > 0) ? product.images[0] : "",
-          images: product.images || [],
-          category: product.category,
-          brand: product.brand,
-          color: product.color,
-          inStock: !!product.inStock,
-          stock: Number(product.stock),
+          image: (product.images && product.images.length > 0) ? product.images[0] : (product.image || ""),
+          images: Array.isArray(product.images) ? product.images : ((product.image ? [product.image] : [])),
+          category: product.category || "Other",
+          brand: product.brand || "Other",
+          color: product.color || "Other",
+          inStock: product.inStock !== undefined ? !!product.inStock : true,
+          stock: product.stock !== undefined ? Number(product.stock) : 10,
           isOffer: !!product.offer,
           isBestSeller: !!product.bestSeller,
-          description: product.description,
+          description: product.description || "",
           offerPrice: product.offer ? Number(product.offerPrice) : 0,
           discountPercent: product.offer ? Number(product.discountPercent) : 0,
           freeDelivery: !!product.freeDelivery,
-          deliveryPrice: product.freeDelivery ? 0 : Number(product.deliveryPrice)
+          deliveryPrice: product.freeDelivery ? 0 : Number(product.deliveryPrice),
+          tags: product.tags || ""
         };
         await addAccessory(accessoryData);
       }
