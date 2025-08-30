@@ -47,7 +47,17 @@ const features = [
 
 const WhyChooseUs = () => {
   return (
-  <section className="max-w-7xl mx-auto px-4 py-16" style={{ background: 'rgba(0, 51, 204, 0.28)' }}>
+    <section
+      className="max-w-7xl mx-auto px-4 py-16"
+      style={{
+        background: 'rgba(10, 24, 61, 0.55)',
+        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderRadius: '24px',
+        border: '1.5px solid rgba(255, 255, 255, 0.18)',
+      }}
+    >
       <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Us</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
         {features.map(({ id, title, description, icon }) => (
