@@ -1,32 +1,36 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Command mapping for English, Hindi, Marathi
+// Expanded command map for VoiceBot
+// Add these to VoiceBot.jsx, replacing the old commandMap
 const commandMap = [
-  // English
-  { phrases: ["home", "open home", "go home", "main page"], path: "/" },
-  { phrases: ["products", "open products", "show products", "product page"], path: "/products" },
-  { phrases: ["accessory", "open accessory", "show accessories", "accessory page"], path: "/accessory" },
-  { phrases: ["cart", "open cart", "show cart"], path: "/cart" },
-  { phrases: ["wishlist", "open wishlist", "show wishlist"], path: "/wishlist" },
-  { phrases: ["profile", "open profile", "show profile"], path: "/profile" },
-  { phrases: ["help", "open help", "show help"], path: "/help" },
-  // Hindi
-  { phrases: ["ghar", "मुख्य पृष्ठ", "होम", "होम खोलो"], path: "/" },
-  { phrases: ["उत्पाद", "products", "products खोलो", "products दिखाओ"], path: "/products" },
-  { phrases: ["सामान", "accessory", "accessory खोलो"], path: "/accessory" },
-  { phrases: ["कार्ट", "cart खोलो"], path: "/cart" },
-  { phrases: ["इच्छा सूची", "wishlist खोलो"], path: "/wishlist" },
-  { phrases: ["प्रोफ़ाइल", "profile खोलो"], path: "/profile" },
-  { phrases: ["मदद", "help खोलो"], path: "/help" },
-  // Marathi
-  { phrases: ["मुख्य पृष्ठ", "होम", "होम उघडा"], path: "/" },
-  { phrases: ["उत्पादने", "products उघडा", "products दाखवा"], path: "/products" },
-  { phrases: ["सामान", "accessory उघडा"], path: "/accessory" },
-  { phrases: ["कार्ट", "cart उघडा"], path: "/cart" },
-  { phrases: ["इच्छा यादी", "wishlist उघडा"], path: "/wishlist" },
-  { phrases: ["प्रोफाइल", "profile उघडा"], path: "/profile" },
-  { phrases: ["मदत", "help उघडा"], path: "/help" },
+  // User side
+  { phrases: ["home", "open home", "go home", "main page", "मुख्य पृष्ठ", "होम", "होम खोलो"], path: "/" },
+  { phrases: ["products", "open products", "show products", "product page", "उत्पाद", "products खोलो", "products दिखाओ", "उत्पादने", "products उघडा", "products दाखवा"], path: "/products" },
+  { phrases: ["accessory", "open accessory", "show accessories", "accessory page", "सामान", "accessory खोलो", "accessory उघडा"], path: "/accessory" },
+  { phrases: ["cart", "open cart", "show cart", "कार्ट", "cart खोलो", "cart उघडा"], path: "/cart" },
+  { phrases: ["wishlist", "open wishlist", "show wishlist", "इच्छा सूची", "wishlist खोलो", "इच्छा यादी", "wishlist उघडा"], path: "/wishlist" },
+  { phrases: ["profile", "open profile", "show profile", "प्रोफ़ाइल", "profile खोलो", "प्रोफाइल", "profile उघडा"], path: "/profile" },
+  { phrases: ["help", "open help", "show help", "मदद", "help खोलो", "मदत", "help उघडा"], path: "/help" },
+  { phrases: ["login", "log in", "sign in", "लॉगिन", "लॉग इन", "साइन इन"], action: "login" },
+  { phrases: ["signup", "sign up", "register", "साइनअप", "रजिस्टर", "नोंदणी"], action: "signup" },
+  { phrases: ["forgot password", "reset password", "पासवर्ड भूल गए", "पासवर्ड रीसेट", "पासवर्ड विसरलात"], action: "forgot" },
+  { phrases: ["reviews", "open reviews", "show reviews", "review page", "समीक्षा", "reviews खोलो", "reviews उघडा"], path: "/review" },
+  { phrases: ["add review", "add reviews", "write review", "समीक्षा लिखें", "समीक्षा जोडा"], path: "/add-review" },
+  { phrases: ["orders", "my orders", "order history", "ऑर्डर", "माझी ऑर्डर", "ऑर्डर इतिहास"], path: "/orders" },
+  { phrases: ["track order", "track my order", "ऑर्डर ट्रैक करें", "ऑर्डर ट्रॅक करा"], path: "/track-order" },
+  { phrases: ["apply filter", "filter products", "फिल्टर लगाएं", "फिल्टर करा"], action: "filter" },
+  // Admin side
+  { phrases: ["admin login", "open admin login", "एडमिन लॉगिन"], path: "/admin/login" },
+  { phrases: ["admin dashboard", "open admin dashboard", "एडमिन डॅशबोर्ड"], path: "/admin/dashboard" },
+  { phrases: ["admin products", "open admin products", "एडमिन उत्पाद"], path: "/admin/products" },
+  { phrases: ["admin orders", "open admin orders", "एडमिन ऑर्डर"], path: "/admin/orders" },
+  { phrases: ["admin customers", "open admin customers", "एडमिन ग्राहक"], path: "/admin/customers" },
+  { phrases: ["admin feedback", "open admin feedback", "एडमिन फीडबॅक"], path: "/admin/feedback" },
+  { phrases: ["admin add product", "add admin product", "एडमिन उत्पाद जोडा"], path: "/admin/add-product" },
+  { phrases: ["admin edit product", "edit admin product", "एडमिन उत्पाद संपादित करा"], path: "/admin/edit-product" },
+  { phrases: ["admin existing products", "existing admin products", "एडमिन विद्यमान उत्पाद"], path: "/admin/existing-products" },
+  // Add more as needed
 ];
 
 const VoiceBot = () => {
@@ -53,7 +57,27 @@ const VoiceBot = () => {
         // Try to match command
         for (const cmd of commandMap) {
           if (cmd.phrases.some(p => transcript.includes(p))) {
-            navigate(cmd.path);
+            if (cmd.path) {
+              navigate(cmd.path);
+            } else if (cmd.action) {
+              // Handle actions like login, signup, forgot password, filter
+              switch (cmd.action) {
+                case "login":
+                  // Trigger login modal or navigate to login page
+                  break;
+                case "signup":
+                  // Trigger signup modal or navigate to signup page
+                  break;
+                case "forgot":
+                  // Trigger forgot password modal or navigate to forgot password page
+                  break;
+                case "filter":
+                  // Apply filter logic
+                  break;
+                default:
+                  break;
+              }
+            }
             setListening(false);
             return;
           }
