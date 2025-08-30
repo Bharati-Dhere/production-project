@@ -332,6 +332,28 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
+                {/* Login/Logout button below links */}
+                {!user ? (
+                  <button
+                    className="mt-4 w-full px-3 py-2 rounded font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
+                    onClick={() => {
+                      setShowAuthModal(true);
+                      setShowMobileMenu(false);
+                    }}
+                  >
+                    Login
+                  </button>
+                ) : (
+                  <button
+                    className="mt-4 w-full px-3 py-2 rounded font-semibold bg-gray-200 text-blue-700 hover:bg-gray-300 transition"
+                    onClick={() => {
+                      handleLogout();
+                      setShowMobileMenu(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                )}
               </nav>
             </div>
           </div>
