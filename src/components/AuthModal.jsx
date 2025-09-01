@@ -179,7 +179,6 @@ export default function AuthModal({ onClose, role, forceForgot }) {
             <PasswordResetModal
               showModal={showPasswordReset}
               setShowModal={setShowPasswordReset}
-              user={{ email: forgotEmail, emailVerified: true }}
               onSuccess={() => {
                 setForgotStep(0);
                 setForgotEmail("");

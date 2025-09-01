@@ -4,7 +4,7 @@ const BACKEND_URL = "https://production-project-1.onrender.com";
 // PasswordResetModal.jsx
 
 
-export default function PasswordResetModal({ showModal, setShowModal }) {
+export default function PasswordResetModal({ showModal, setShowModal, onSuccess }) {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -29,10 +29,11 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     if (step === 4 && showModal) {
       const timer = setTimeout(() => {
         setShowModal(false);
+        if (onSuccess) onSuccess();
       }, 1200);
       return () => clearTimeout(timer);
     }
-  }, [step, setShowModal, showModal]);
+  }, [step, setShowModal, showModal, onSuccess]);
 
   // Step 1: Send email code
   const handleSendCode = async () => {
@@ -114,7 +115,10 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
         <button
-          onClick={() => setShowModal(false)}
+          onClick={() => {
+            setShowModal(false);
+            if (onSuccess) onSuccess();
+          }}
           className="absolute top-2 right-3 text-xl"
         >
           ✕
