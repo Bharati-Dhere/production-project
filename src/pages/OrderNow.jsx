@@ -1,37 +1,8 @@
-// Always update wishlistProducts when modal is opened
-  //  useEffect(() => {
-  //   if (showWishlistModal) {
-  //     try {
-  //       const user = JSON.parse(localStorage.getItem("user"));
-  //       const raw = localStorage.getItem(`wishlist_${user?.email}`);
-  //       if (raw) {
-  //         const parsed = JSON.parse(raw);
-  //         if (Array.isArray(parsed)) setWishlistProducts(parsed);
-  //         else setWishlistProducts([]);
-  //       } else {
-  //         setWishlistProducts([]);
-  //       }
-  //     } catch (e) {
-  //       setWishlistProducts([]);
-  //     }
-  //   } else {
-  //     setWishlistProducts([]);
-  //   }
-  // }, [showWishlistModal, wishlistModalKey]);
-  //   // Order products state
-  //   const [orderProducts, setOrderProducts] = useState(() => {
-  //     if (products && Array.isArray(products)) {
-  //       return products.map(p => ({ ...p, quantity: p.quantity || 1 }));
-  //     }
-  //     if (product) return [{ ...product, quantity: amount || 1 }];
-  //     return [];
-  //   });
-
 import React, { useState, useEffect } from "react";
 import { FaHeart, FaRegHeart, FaTimes } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { placeOrder, fetchWishlist } from '../utils/api';
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
 
 const ORDER_STEPS = ["Shipping Info", "Address", "Payment"];
@@ -41,7 +12,7 @@ export default function OrderNow() {
   const location = useLocation();
   const navigate = useNavigate();
   const { product, amount, products } = location.state || {};
-  
+
   const [step, setStep] = useState(0);
   const [shipping, setShipping] = useState({ name: "", address: "", pincode: "", phone: "" });
   const [addressError, setAddressError] = useState("");
@@ -53,6 +24,8 @@ export default function OrderNow() {
   const [wishlistModalKey, setWishlistModalKey] = useState(0);
   const [orderError, setOrderError] = useState("");
   const [wishlistError, setWishlistError] = useState("");
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [allProductsAndAccessories, setAllProductsAndAccessories] = useState([]);
 
   const [orderProducts, setOrderProducts] = useState(() => {
     if (products && Array.isArray(products)) {
@@ -67,8 +40,6 @@ export default function OrderNow() {
       if (showWishlistModal) {
         try {
           setWishlistError("");
-          // Debug: Modal open, fetching wishlist
-          console.log("Wishlist modal opened, fetching wishlist for user:", user?.id);
           const res = await axios.get(`https://production-project-1.onrender.com/api/users/by-external-id/${user.id}`);
           const mongoUser = res.data?.data;
           const wishlistData = await fetchWishlist(mongoUser._id);
@@ -96,25 +67,29 @@ export default function OrderNow() {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user || !user.email) {
       navigate("/ordernow");
-      return;
-    }
-    if (!shipping.address && !shipping.pincode) {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const profile = users.find(u => u.email === user.email);
-      if (profile && (profile.address || profile.pincode)) {
-        setShipping(s => ({
-          ...s,
-          address: profile.address || "",
-          pincode: profile.pincode || ""
-        }));
-      }
     }
   }, [navigate]);
+
+  useEffect(() => {
+    async function fetchAll() {
+      try {
+        const productsRes = await fetch('https://production-project-1.onrender.com/api/products');
+        const productsData = await productsRes.json();
+        const accessoriesRes = await fetch('https://production-project-1.onrender.com/api/accessories');
+        const accessoriesData = await accessoriesRes.json();
+        const products = (productsData.data || []).map(p => ({ ...p, type: 'Product' }));
+        const accessories = (accessoriesData.data || []).map(a => ({ ...a, type: 'Accessory' }));
+        setAllProductsAndAccessories([...products, ...accessories]);
+      } catch (e) {
+        setAllProductsAndAccessories([]);
+      }
+    }
+    if (showAddProductModal) fetchAll();
+  }, [showAddProductModal]);
 
   const handleNext = () => setStep(s => Math.min(s + 1, ORDER_STEPS.length - 1));
   const handlePrev = () => setStep(s => Math.max(s - 1, 0));
 
-  // Set delivery date to 3 days from now to match backend logic
   const getEstimatedDeliveryDate = () => {
     const d = new Date();
     d.setDate(d.getDate() + 3);
@@ -125,12 +100,11 @@ export default function OrderNow() {
   const saveOrder = async () => {
     setLoading(true);
     try {
-      // Prepare order payload for backend
       const items = orderProducts.map(p => ({
         product: p._id || p.id,
         quantity: p.quantity || 1,
         price: p.price,
-        productType: p.category && p.category.toLowerCase() === 'accessory' ? 'Accessory' : 'Product'
+        productType: p.type || (p.category && p.category.toLowerCase() === 'accessory' ? 'Accessory' : 'Product')
       }));
       const total = orderProducts.reduce((sum, p) => sum + (p.price || 0) * (p.quantity || 1), 0) + orderProducts.reduce((sum, p) => sum + (p.deliveryPrice || 0) * (p.quantity || 1), 0);
       const newOrder = {
@@ -140,7 +114,6 @@ export default function OrderNow() {
         paymentInfo: payment,
         deliveryDate
       };
-      // Call backend order API (placeOrder)
       await placeOrder(newOrder);
       localStorage.setItem("cart", JSON.stringify([]));
       setShowPopup(true);
@@ -153,11 +126,11 @@ export default function OrderNow() {
 
   const handlePlaceOrder = async () => {
     if (payment.method === 'UPI') {
-      const grandTotal = orderProducts.reduce((sum, p) => 
+      const grandTotal = orderProducts.reduce((sum, p) =>
         sum + ((p.price || 0) + (p.deliveryPrice || 0)) * (p.quantity || 1), 0
       );
       try {
-  const orderRes = await fetch('https://production-project-1.onrender.com/create-order', {
+        const orderRes = await fetch('https://production-project-1.onrender.com/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: grandTotal })
@@ -168,7 +141,7 @@ export default function OrderNow() {
           return;
         }
         const options = {
-          key: 'rzp_test_uNl7K4UX0VyScu', // replace with your test key_id
+          key: 'rzp_test_uNl7K4UX0VyScu',
           amount: orderData.amount,
           currency: orderData.currency,
           name: 'Mobile Shop',
@@ -182,7 +155,6 @@ export default function OrderNow() {
             });
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
-              // After payment, call backend order API
               await saveOrder();
             } else {
               alert('Payment verification failed!');
@@ -217,6 +189,7 @@ export default function OrderNow() {
       </div>
     );
   }
+
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-6">
       <h2 className="text-2xl font-bold mb-6 text-center">Order Now</h2>
@@ -245,26 +218,56 @@ export default function OrderNow() {
       {step === 0 && (
         <div className="animate-fade-in space-y-4">
           <h3 className="font-semibold mb-2">Shipping Information</h3>
-          {/* <div className="flex gap-4 mb-4">
+          <div className="flex gap-4 mb-4">
             <button
-              className="flex items-center gap
-              -2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-transform hover:scale-105"
-              onClick={() => {
-                setWishlistModalKey(k => k + 1);
-                setShowWishlistModal(true);
-              }}
-              disabled={!isLoaded || !user || !user.id}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-transform hover:scale-105"
+              onClick={() => setShowAddProductModal(true)}
             >
-              <FaHeart className="text-lg animate-pulse" /> Add from Wishlist
+              Add Product
             </button>
-          </div> */}
+          </div>
+          {/* Add Product Modal */}
+          {showAddProductModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
+                <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl" onClick={() => setShowAddProductModal(false)}>&times;</button>
+                <h2 className="text-xl font-bold mb-4 text-blue-700">Add Products & Accessories</h2>
+                <div className="overflow-y-auto max-h-[60vh]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {allProductsAndAccessories.map((item) => (
+                      <div key={item._id} className="flex items-center gap-4 border-b pb-3 last:border-b-0">
+                        <img src={item.image} alt={item.name} className="w-16 h-16 object-contain rounded bg-gray-100" />
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-800">{item.name}</div>
+                          <div className="text-xs text-gray-500 flex gap-2 items-center">
+                            <span>Price: <span className="font-semibold text-green-700">₹{item.price}</span></span>
+                            {item.deliveryPrice && item.deliveryPrice > 0 ? (
+                              <span>Delivery: <span className="font-semibold text-blue-700">₹{item.deliveryPrice}</span></span>
+                            ) : (
+                              <span className="text-green-600">Free Delivery</span>
+                            )}
+                            <span className="ml-2 px-2 py-1 rounded text-xs bg-gray-200 text-gray-700">{item.category || 'Product'}</span>
+                          </div>
+                        </div>
+                        {orderProducts.some(p => p.id === item._id) ? (
+                          <button className="ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700" onClick={() => setOrderProducts(orderProducts.filter(p => p.id !== item._id))}>Remove</button>
+                        ) : (
+                          <button className="ml-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setOrderProducts([...orderProducts, { ...item, id: item._id, quantity: 1 }])}>Add</button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="mb-4 p-4 bg-white rounded-xl shadow border">
             {orderProducts.length > 0 ? (
               <>
                 <div className="flex flex-col gap-4">
                   {orderProducts.map((p, idx) => (
                     <div key={p.id} className="flex items-center gap-4 border-b pb-3 last:border-b-0">
-                      <img src={p.image} alt={p.name} className="w-16 h-16 object-contain rounded bg-gray-100" />
+                      {/* Removed product image as requested */}
                       <div className="flex-1">
                         <div className="font-medium text-gray-800">{p.name}</div>
                         <div className="text-xs text-gray-500 flex gap-2 items-center">
@@ -299,14 +302,11 @@ export default function OrderNow() {
           {showWishlistModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
               <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl flex flex-col" style={{ zIndex: 9999, maxHeight: '90vh' }}>
-                {/* Modal Header (fixed) */}
                 <div className="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2">
                   <h3 className="text-lg font-bold text-blue-700 flex items-center gap-2"><FaHeart /> Select Products from Wishlist</h3>
                   <button className="text-2xl text-gray-400 hover:text-red-500" onClick={() => { setShowWishlistModal(false); setWishlistProducts([]); setWishlistError(""); }}><FaTimes /></button>
                 </div>
-                {/* Modal Body (scrollable) */}
                 <div className="flex-1 min-h-[120px] h-[60vh] overflow-y-auto">
-                  {/* Debug output for wishlistProducts */}
                   <pre style={{ background: '#f8f8ff', color: '#333', fontSize: '12px', padding: '8px', borderRadius: '6px', marginBottom: '8px' }}>
                     {JSON.stringify(wishlistProducts, null, 2)}
                   </pre>
@@ -325,7 +325,6 @@ export default function OrderNow() {
                           const isInOrder = orderProducts.some(item => item.id === p._id);
                           return (
                             <div key={p._id} className={`rounded-xl border shadow hover:shadow-lg transition p-0 bg-white flex flex-col ${isInOrder ? 'ring-2 ring-blue-400' : ''}`}>
-                              {/* Product image */}
                               <div className="h-40 w-full bg-gray-100 flex items-center justify-center rounded-t-xl overflow-hidden">
                                 {p.image ? (
                                   <img src={p.image} alt={p.name} className="object-contain h-full w-full" />
@@ -377,7 +376,6 @@ export default function OrderNow() {
                     </div>
                   ) : null}
                 </div>
-                {/* Modal Footer */}
                 <div className="flex justify-end mt-6">
                   <button type="button" className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition" onClick={() => { setShowWishlistModal(false); setWishlistProducts([]); setWishlistError(""); }}>
                     Done
@@ -400,7 +398,7 @@ export default function OrderNow() {
                 <div className="flex flex-col gap-4">
                   {orderProducts.map((p) => (
                     <div key={p.id} className="flex items-center gap-4 border-b pb-3 last:border-b-0">
-                      <img src={p.image} alt={p.name} className="w-12 h-12 object-contain rounded bg-gray-100" />
+                      {/* Removed product image as requested */}
                       <div className="flex-1">
                         <div className="font-medium text-gray-800">{p.name}</div>
                         <div className="text-xs text-gray-500 flex gap-2 items-center">
@@ -421,7 +419,6 @@ export default function OrderNow() {
               <p className="text-gray-500">No products selected for order.</p>
             )}
           </div>
-          {/* Address & Pincode UI */}
           <div className="mb-4 p-4 bg-white rounded-xl shadow border">
             <div className="mb-4">
               <label className="block font-semibold mb-1">Address</label>
@@ -470,7 +467,6 @@ export default function OrderNow() {
         <div className="space-y-4 animate-fade-in">
           <h3 className="font-semibold mb-2">Payment</h3>
           <div className="space-y-4">
-            {/* Modern Payment Option Cards */}
             <div
               className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 shadow-sm text-lg font-semibold 
                 ${payment.method === 'COD' ? 'border-blue-600 bg-blue-50 scale-[1.02] ring-2 ring-blue-300' : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50'}
@@ -509,37 +505,22 @@ export default function OrderNow() {
               <span className="flex-1">Online UPI</span>
               <span className="text-green-600 font-bold">UPI</span>
             </div>
-            {/* UPI Input */}
-            {/* {payment.method === "UPI" && (
-              <div className="mb-2 animate-fade-in">
-                <label className="block font-semibold mb-1 text-blue-700">UPI ID</label>
-                <input
-                  type="text"
-                  placeholder="Enter UPI ID"
-                  value={payment.upi}
-                  onChange={e => setPayment({ ...payment, upi: e.target.value })}
-                  className="border-2 border-blue-300 px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-400 transition-all text-lg"
-                  autoFocus
-                />
-              </div>
-            )} */}
           </div>
-          {/* Delivery Date Info */}
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 text-blue-800 text-center">
             <span className="font-semibold">Estimated Delivery Date: </span>
             <span>{deliveryDate}</span>
           </div>
           <div className="flex justify-between gap-2 mt-4">
-          <button onClick={handlePrev} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">Back</button>
-          <button
-            onClick={handlePlaceOrder}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-all shadow-md text-lg font-semibold"
-            disabled={loading}
-          >
-            {loading ? (payment.method === 'UPI' ? "Paying..." : "Placing...") : (payment.method === 'UPI' ? "Pay & Place Order" : "Place Order")}
-          </button>
+            <button onClick={handlePrev} className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition">Back</button>
+            <button
+              onClick={handlePlaceOrder}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-all shadow-md text-lg font-semibold"
+              disabled={loading}
+            >
+              {loading ? (payment.method === 'UPI' ? "Paying..." : "Placing...") : (payment.method === 'UPI' ? "Pay & Place Order" : "Place Order")}
+            </button>
+          </div>
         </div>
-        </div> //might give error
       )}
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
