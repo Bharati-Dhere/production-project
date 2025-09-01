@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { placeOrder, fetchWishlist } from '../utils/api';
 import { useUser } from '@clerk/clerk-react';
 import axios from 'axios';
+import ProductCard from '../components/ProductCard';
 
 const ORDER_STEPS = ["Shipping Info", "Address", "Payment"];
 
