@@ -38,7 +38,7 @@ router.post('/forgot-password/verify', async (req, res) => {
   // Password policy: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
   if (!passwordRegex.test(password)) {
-    return res.status(400).json({ message: 'Password must be at least 8 characters, include uppercase, lowercase, digit, and special character.' });
+    return res.status(400).json({ message: 'Password must be at least 8 characters, include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.' });
   }
   delete forgotCodes[email];
   const user = await User.findOne({ email });
@@ -76,7 +76,7 @@ router.post('/signup/verify', async (req, res) => {
   // Password policy: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
   if (!passwordRegex.test(password)) {
-    return res.status(400).json({ message: 'Password must be at least 8 characters, include uppercase, lowercase, digit, and special character.' });
+    return res.status(400).json({ message: 'Password must be at least 8 characters, include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.' });
   }
   delete verificationCodes[email];
   const existingEmail = await User.findOne({ email });
