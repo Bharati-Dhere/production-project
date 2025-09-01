@@ -39,12 +39,22 @@ exports.updateOrderStatus = async (req, res) => {
 };
 const Order = require('../models/Order');
 
+const User = require('../models/User');
 exports.getAllOrders = async (req, res) => {
   try {
-    // Only return orders for the logged-in user
-    const orders = await Order.find({ user: req.userId })
-      .populate('user', 'email name')
-      .populate('items.product', 'name price image category brand');
+    const user = await User.findById(req.userId);
+    let orders;
+    if (user && user.role === 'admin') {
+      // Admin: return all orders
+      orders = await Order.find()
+        .populate('user', 'email name')
+        .populate('items.product', 'name price image category brand');
+    } else {
+      // User: only their own orders
+      orders = await Order.find({ user: req.userId })
+        .populate('user', 'email name')
+        .populate('items.product', 'name price image category brand');
+    }
     res.json({ success: true, message: 'Orders fetched', data: orders });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error', data: null });
