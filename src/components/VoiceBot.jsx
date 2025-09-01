@@ -8,7 +8,7 @@ import { AuthContext } from "../context/AuthContext";
 const commandMap = [
   // User side
   { phrases: ["home", "open home", "go home", "main page", "मुख्य पृष्ठ", "होम", "होम खोलो"], path: "/" },
-  { phrases: ["products", "open products", "show products", "product page", "उत्पाद", "products खोलो", "products दिखाओ", "उत्पादने", "products उघडा", "products दाखवा"], path: "/products" },
+  { phrases: ["products", "open products",  "product page", "उत्पाद", "products खोलो", "products दिखाओ", "उत्पादने", "products उघडा", "products दाखवा"], path: "/products" },
   { phrases: ["accessory", "open accessory", "show accessories", "accessory page", "सामान", "accessory खोलो", "accessory उघडा"], path: "/accessory" },
   { phrases: ["cart", "open cart", "show cart", "कार्ट", "cart खोलो", "cart उघडा"], path: "/cart" },
   { phrases: ["wishlist", "open wishlist", "show wishlist", "इच्छा सूची", "wishlist खोलो", "इच्छा यादी", "wishlist उघडा"], path: "/wishlist" },
@@ -17,19 +17,15 @@ const commandMap = [
   { phrases: ["login", "log in", "sign in", "लॉगिन", "लॉग इन", "साइन इन"], action: "login" },
   { phrases: ["signup", "sign up", "register", "साइनअप", "रजिस्टर", "नोंदणी"], action: "signup" },
   { phrases: ["forgot password", "reset password", "पासवर्ड भूल गए", "पासवर्ड रीसेट", "पासवर्ड विसरलात"], action: "forgot" },
-  { phrases: ["reviews", "open reviews", "show reviews", "review page", "समीक्षा", "reviews खोलो", "reviews उघडा"], path: "/review" },
+  { phrases: ["reviews", "open reviews", "show reviews", "reviews page", "समीक्षा", "reviews खोलो", "reviews उघडा"], path: "/review" },
   { phrases: ["add review", "add reviews", "write review", "समीक्षा लिखें", "समीक्षा जोडा"], path: "/add-review" },
-  { phrases: ["orders", "my orders", "order history", "ऑर्डर", "माझी ऑर्डर", "ऑर्डर इतिहास"], path: "/orders" },
-  { phrases: ["track order", "track my order", "ऑर्डर ट्रैक करें", "ऑर्डर ट्रॅक करा"], path: "/track-order" },
   { phrases: ["apply filter", "filter products", "फिल्टर लगाएं", "फिल्टर करा"], action: "filter" },
   // Admin side (expanded for natural language)
   { phrases: ["admin login", "open admin login", "एडमिन लॉगिन"], path: "/admin/login" },
   { phrases: [
     "admin dashboard", "open admin dashboard", "dashboard", "dashboard page", "एडमिन डॅशबोर्ड", "डॅशबोर्ड", "डॅशबोर्ड पेज"
   ], path: "/admin/dashboard" },
-  { phrases: [
-    "admin products", "open admin products", "show products", "products", "products page", "existing products", "existing product", "एडमिन उत्पाद", "उत्पाद", "उत्पाद पेज", "उत्पाद दाखवा", "उत्पादने", "products उघडा", "products दाखवा"
-  ], path: "/admin/products" },
+  
   { phrases: [
     "admin orders", "open admin orders", "orders", "orders page", "order page", "order", "ऑर्डर", "ऑर्डर पेज", "ऑर्डर उघडा", "ऑर्डर दाखवा", "एडमिन ऑर्डर"
   ], path: "/admin/orders" },
@@ -42,9 +38,6 @@ const commandMap = [
   { phrases: [
     "admin add product", "add admin product", "add product", "add products", "add products page", "add product page", "open add product page", "open add products page", "open add admin product page", "open add admin products page", "उत्पाद जोडा", "उत्पाद जोडा पेज", "एडमिन उत्पाद जोडा"
   ], path: "/admin/add-product" },
-  { phrases: [
-    "admin edit product", "edit admin product", "edit product", "edit products", "open edit product page", "open edit products page", "उत्पाद संपादित करा", "एडमिन उत्पाद संपादित करा"
-  ], path: "/admin/edit-product" },
   { phrases: [
     "admin existing products", "existing admin products", "existing products", "existing product", "show product", "show products", "view product", "view products", "open show product page", "open show products page", "open view product page", "open view products page", "open existing product page", "open existing products page", "open exisitngproduct page", "open exisitngproducts page", "exisitngproduct", "exisitngproducts", "विद्यमान उत्पाद", "एडमिन विद्यमान उत्पाद"
   ], path: "/admin/existing-products" },
