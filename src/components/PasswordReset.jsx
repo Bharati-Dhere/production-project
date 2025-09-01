@@ -46,7 +46,7 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
       });
       const data = await response.json();
       if (!response.ok) {
-        setMessage(data.message || "Error sending code.");
+  setMessage(data.message || "Error sending code.");
         setStep(1);
         setLoading(false);
         return;
@@ -101,7 +101,7 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
       });
       const data = await response.json();
       if (!response.ok) {
-        setMessage(data.message || "Error setting password.");
+        setMessage((data.message || "Error setting password.") + (data.message && data.message.includes('Password must') ? '\nPassword must be at least 8 characters, include uppercase, lowercase, digit, and special character.' : ''));
         setLoading(false);
         return;
       }
@@ -126,7 +126,7 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
 
         <h2 className="text-xl font-semibold mb-4 text-center">Forgot Password</h2>
 
-        {message && <p className="mb-3 text-sm text-blue-600">{message}</p>}
+  {message && <p className={`mb-3 text-sm ${message.toLowerCase().includes('password must') || message.toLowerCase().includes('error') ? 'text-red-600' : 'text-blue-600'}`}>{message}</p>}
 
         {step === 1 && (
           <>

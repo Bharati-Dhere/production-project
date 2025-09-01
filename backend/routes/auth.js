@@ -35,9 +35,14 @@ router.post('/forgot-password/verify', async (req, res) => {
   if (!forgotCodes[email] || forgotCodes[email].code !== code || forgotCodes[email].expires < Date.now()) {
     return res.status(400).json({ message: 'Invalid or expired verification code.' });
   }
+  // Password policy: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters, include uppercase, lowercase, digit, and special character.' });
+  }
   delete forgotCodes[email];
   const user = await User.findOne({ email });
-  if (!user) return res.status(400).json({ message: 'User not found.' });
+  if (!user) return res.status(400).json({ message: 'Email not registered. Please sign up first.' });
   user.password = await bcrypt.hash(password, 10);
   await user.save();
   res.json({ message: 'Password reset successful.' });
@@ -68,6 +73,11 @@ router.post('/signup/verify', async (req, res) => {
   if (!verificationCodes[email] || verificationCodes[email].code !== code || verificationCodes[email].expires < Date.now()) {
     return res.status(400).json({ message: 'Invalid or expired verification code.' });
   }
+  // Password policy: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters, include uppercase, lowercase, digit, and special character.' });
+  }
   delete verificationCodes[email];
   const existingEmail = await User.findOne({ email });
   if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
@@ -88,7 +98,7 @@ router.post('/login', async (req, res) => {
     console.log('Login attempt:', { email, role });
     if (!user) {
       console.log('User not found');
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Email not registered. Please sign up first.' });
     }
     if (role === 'admin') {
       if (user.role !== 'admin') {
@@ -105,7 +115,7 @@ router.post('/login', async (req, res) => {
     console.log('Password match:', match);
     if (!match) {
       console.log('Password does not match');
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Incorrect password.' });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
     res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });

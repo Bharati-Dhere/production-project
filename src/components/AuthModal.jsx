@@ -45,7 +45,7 @@ export default function AuthModal({ onClose, role, forceForgot }) {
       setLoginErrors({});
       onClose && onClose();
     } else {
-      setLoginErrors({ general: (result && result.message) || "Login failed." });
+  setLoginErrors({ general: (result && result.message) || "Login failed." });
     }
     setLoading(false);
   };
@@ -226,7 +226,7 @@ export default function AuthModal({ onClose, role, forceForgot }) {
                 className="w-full border p-2 rounded text-sm"
                 autoComplete="current-password"
               />
-              {loginErrors.general && <p className="text-red-600 text-sm mb-2">{loginErrors.general}</p>}
+              {loginErrors.general && <p className={`text-sm mb-2 ${loginErrors.general.toLowerCase().includes('password') || loginErrors.general.toLowerCase().includes('email') ? 'text-red-600' : 'text-blue-600'}`}>{loginErrors.general}</p>}
               <button
                 type="submit"
                 className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200 text-base sm:text-sm"
@@ -294,7 +294,7 @@ export default function AuthModal({ onClose, role, forceForgot }) {
                   autoComplete="new-password"
                 />
                 {signupErrors.confirmPassword && <p className="text-red-600 text-sm mt-1">{signupErrors.confirmPassword}</p>}
-                {signupErrors.general && <p className="text-red-600 text-sm mb-2">{signupErrors.general}</p>}
+                {signupErrors.general && <p className={`text-sm mb-2 ${signupErrors.general.toLowerCase().includes('password') || signupErrors.general.toLowerCase().includes('email') ? 'text-red-600' : 'text-blue-600'}`}>{signupErrors.general}</p>}
                 <button
                   type="submit"
                   className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200 text-base sm:text-sm"
