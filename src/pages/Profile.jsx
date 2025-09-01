@@ -259,7 +259,7 @@ export default function Profile() {
         email: userData.email,
         phone: userData.profile?.phone || userData.phone || ""
       });
-      setAvatar(userData.profile?.avatar || null);
+  setAvatar(userData.profile?.avatar || userData.profileImage || null);
       setNotifications(userData.profile?.notifications || false);
       const ordersData = await fetchOrders();
       setOrders(Array.isArray(ordersData) ? ordersData : []);

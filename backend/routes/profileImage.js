@@ -14,7 +14,8 @@ const upload = multer({ storage });
 router.post('/profile-image', upload.single('image'), async (req, res) => {
   const userId = req.body.userId;
   const imageUrl = `https://production-project-1.onrender.com/uploads/${req.file.filename}`;
-  await User.findByIdAndUpdate(userId, { profileImage: imageUrl });
+  // Update both profileImage (root) and profile.avatar (nested)
+  await User.findByIdAndUpdate(userId, { profileImage: imageUrl, 'profile.avatar': imageUrl });
   res.json({ success: true, imageUrl });
 });
 

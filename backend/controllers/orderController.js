@@ -41,7 +41,8 @@ const Order = require('../models/Order');
 
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
+    // Only return orders for the logged-in user
+    const orders = await Order.find({ user: req.userId })
       .populate('user', 'email name')
       .populate('items.product', 'name price image category brand');
     res.json({ success: true, message: 'Orders fetched', data: orders });
