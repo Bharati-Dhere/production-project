@@ -98,7 +98,8 @@ export default function AdminOrders() {
           filteredOrders.map((o) => (
             <li key={o._id} className="bg-gray-50 p-4 rounded flex flex-col md:flex-row md:justify-between md:items-center gap-2">
               <span className="font-medium text-gray-800">Order #{o._id}</span>
-              <span className="text-xs text-gray-500">Placed on: {o.createdAt ? new Date(o.createdAt).toLocaleDateString() : 'N/A'}</span>
+              <span className="text-xs text-gray-700 font-semibold">Placed:&nbsp;</span>
+              <span className="text-xs text-gray-500">{o.createdAt ? new Date(o.createdAt).toLocaleString() : 'N/A'}</span>
               <span className="text-xs text-blue-700 font-semibold">Total: ₹{(o.items || []).reduce((sum, prod) => sum + (Number(prod.price) * Number(prod.quantity || 1)), 0)}</span>
               <span className={`px-2 py-1 rounded text-xs ${o.status === "Delivered" ? "bg-green-100 text-green-700" : o.status === "Cancelled" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>{o.status}</span>
               <span className="text-sm text-gray-500">{o.userEmail || o.user?.email || ''}</span>

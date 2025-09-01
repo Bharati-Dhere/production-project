@@ -114,9 +114,10 @@ export default function OrderNow() {
   const handleNext = () => setStep(s => Math.min(s + 1, ORDER_STEPS.length - 1));
   const handlePrev = () => setStep(s => Math.max(s - 1, 0));
 
+  // Set delivery date to 3 days from now to match backend logic
   const getEstimatedDeliveryDate = () => {
     const d = new Date();
-    d.setDate(d.getDate() + 5);
+    d.setDate(d.getDate() + 3);
     return d.toLocaleDateString();
   };
   const [deliveryDate] = useState(getEstimatedDeliveryDate());
