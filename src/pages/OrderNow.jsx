@@ -237,7 +237,20 @@ export default function OrderNow() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {allProductsAndAccessories.map((item) => (
                     <div key={item._id} className="bg-white rounded-xl shadow p-4 flex flex-col items-center border hover:shadow-lg transition">
-                      <img src={item.image} alt={item.name} className="w-20 h-20 object-contain rounded mb-2 bg-gray-100" />
+                      <div className="flex justify-center items-center mb-2">
+                        {item.image || item.imageUrl ? (
+                          <img
+                            src={item.imageUrl || item.image}
+                            alt={item.name || 'Product Image'}
+                            className="w-20 h-20 object-contain rounded bg-white"
+                            onError={e => { e.target.onerror = null; e.target.src = '/logo192.png'; }}
+                          />
+                        ) : (
+                          <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded">
+                            <span className="text-gray-400 text-xs">No Image</span>
+                          </div>
+                        )}
+                      </div>
                       <div className="font-semibold text-gray-800 text-center mb-1">{item.name}</div>
                       <div className="text-xs text-blue-700 font-semibold mb-1 text-center">{item.category || item.type || 'Product'}</div>
                       <div className="flex gap-2 items-center text-sm mb-2">
