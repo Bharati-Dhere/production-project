@@ -24,7 +24,13 @@ const ordersRoutes = require('./routes/orders');
 const cookieParser = require('cookie-parser');
 const app = express();
 
+// Always apply CORS before any routes
 app.use(cors({
+  origin: 'https://production-project-psi.vercel.app',
+  credentials: true
+}));
+// Handle preflight requests for all routes
+app.options('*', cors({
   origin: 'https://production-project-psi.vercel.app',
   credentials: true
 }));
