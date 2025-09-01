@@ -35,7 +35,11 @@ router.post('/forgot-password/verify', async (req, res) => {
   if (!forgotCodes[email] || forgotCodes[email].code !== code || forgotCodes[email].expires < Date.now()) {
     return res.status(400).json({ message: 'Invalid or expired verification code.' });
   }
-  // Password policy: min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+  // If password is not provided, treat as code verification only (step 1)
+  if (!password) {
+    return res.json({ message: 'Code verified. Set your new password.' });
+  }
+  // If password is provided, validate and reset (step 2)
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
   if (!passwordRegex.test(password)) {
     return res.status(400).json({ message: 'Password must be at least 8 characters, include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.' });
