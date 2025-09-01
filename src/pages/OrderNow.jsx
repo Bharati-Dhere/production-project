@@ -237,9 +237,9 @@ export default function OrderNow() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {allProductsAndAccessories.map((item) => (
                     <div key={item._id} className="bg-white rounded-xl shadow p-4 flex flex-col items-center border hover:shadow-lg transition">
-                      {/* Optionally remove image if you want */}
-                      {/* <img src={item.image} alt={item.name} className="w-20 h-20 object-contain rounded mb-2 bg-gray-100" /> */}
+                      <img src={item.image} alt={item.name} className="w-20 h-20 object-contain rounded mb-2 bg-gray-100" />
                       <div className="font-semibold text-gray-800 text-center mb-1">{item.name}</div>
+                      <div className="text-xs text-blue-700 font-semibold mb-1 text-center">{item.category || item.type || 'Product'}</div>
                       <div className="flex gap-2 items-center text-sm mb-2">
                         <span className="font-semibold text-green-700">₹{item.price}</span>
                         {item.deliveryPrice && item.deliveryPrice > 0 ? (
@@ -248,7 +248,6 @@ export default function OrderNow() {
                           <span className="text-green-600">Free Delivery</span>
                         )}
                       </div>
-                      <span className="px-2 py-1 rounded text-xs bg-gray-200 text-gray-700 mb-2">{item.category || item.type || 'Product'}</span>
                       <div className="mt-auto w-full flex justify-center">
                         {orderProducts.some(p => p.id === item._id) ? (
                           <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 w-full" onClick={() => setOrderProducts(orderProducts.filter(p => p.id !== item._id))}>Remove</button>
