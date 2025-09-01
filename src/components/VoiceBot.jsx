@@ -40,13 +40,13 @@ const commandMap = [
     "admin feedback", "open admin feedback", "feedback", "feedback page", "फीडबॅक", "फीडबॅक पेज", "फीडबॅक उघडा", "फीडबॅक दाखवा", "एडमिन फीडबॅक"
   ], path: "/admin/feedback" },
   { phrases: [
-    "admin add product", "add admin product", "add product", "add products", "add products page", "add product page", "उत्पाद जोडा", "उत्पाद जोडा पेज", "एडमिन उत्पाद जोडा"
+    "admin add product", "add admin product", "add product", "add products", "add products page", "add product page", "open add product page", "open add products page", "open add admin product page", "open add admin products page", "उत्पाद जोडा", "उत्पाद जोडा पेज", "एडमिन उत्पाद जोडा"
   ], path: "/admin/add-product" },
   { phrases: [
-    "admin edit product", "edit admin product", "edit product", "edit products", "उत्पाद संपादित करा", "एडमिन उत्पाद संपादित करा"
+    "admin edit product", "edit admin product", "edit product", "edit products", "open edit product page", "open edit products page", "उत्पाद संपादित करा", "एडमिन उत्पाद संपादित करा"
   ], path: "/admin/edit-product" },
   { phrases: [
-    "admin existing products", "existing admin products", "existing products", "existing product", "विद्यमान उत्पाद", "एडमिन विद्यमान उत्पाद"
+    "admin existing products", "existing admin products", "existing products", "existing product", "show product", "show products", "view product", "view products", "open show product page", "open show products page", "open view product page", "open view products page", "open existing product page", "open existing products page", "open exisitngproduct page", "open exisitngproducts page", "exisitngproduct", "exisitngproducts", "विद्यमान उत्पाद", "एडमिन विद्यमान उत्पाद"
   ], path: "/admin/existing-products" },
   // Add more as needed
 ];
@@ -76,14 +76,22 @@ const VoiceBot = () => {
         // Try to match command
         for (const cmd of commandMap) {
           if (cmd.phrases.some(p => transcript.includes(p))) {
+            // If admin is logged in, only allow admin-side pages
+            if (user && user.role === "admin") {
+              if (cmd.path && cmd.path.startsWith("/admin")) {
+                navigate(cmd.path);
+                setListening(false);
+                return;
+              } else {
+                setError("As admin, you can only open admin pages by voice.");
+                setListening(false);
+                return;
+              }
+            }
+            // If not admin, allow all user-side pages and restrict admin pages
             if (cmd.path) {
-              // Restrict admin pages to admin users only
               if (cmd.path.startsWith("/admin")) {
-                if (user && user.role === "admin") {
-                  navigate(cmd.path);
-                } else {
-                  setError("You must be logged in as admin to access this page.");
-                }
+                setError("You must be logged in as admin to access this page.");
               } else {
                 navigate(cmd.path);
               }
