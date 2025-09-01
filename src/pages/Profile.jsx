@@ -508,7 +508,11 @@ export default function Profile() {
               <p className="text-gray-500">No current orders.</p>
             ) : (
               <ul className="space-y-2">
-  {orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled' && ((o.products && o.products.length > 0) || (o.items && o.items.length > 0)) && o.status && o.status !== 'ProcessingDefault' && (o.user === user._id || o.user === user.id)).map(o => (
+        {orders.filter(o => {
+          const orderUserId = typeof o.user === 'object' ? o.user._id || o.user.id : o.user;
+          const userId = user._id || user.id;
+          return o.status !== 'Delivered' && o.status !== 'Cancelled' && ((o.products && o.products.length > 0) || (o.items && o.items.length > 0)) && o.status && o.status !== 'ProcessingDefault' && orderUserId === userId;
+        }).map(o => (
           <OrderListItem
             key={o.id}
             order={o}
@@ -528,7 +532,11 @@ export default function Profile() {
               <p className="text-gray-500">No orders found.</p>
             ) : (
               <ul className="space-y-2">
-  {orders.filter(o => ((o.products && o.products.length > 0) || (o.items && o.items.length > 0)) && o.status && o.status !== 'ProcessingDefault' && (o.user === user._id || o.user === user.id)).map(o => (
+        {orders.filter(o => {
+          const orderUserId = typeof o.user === 'object' ? o.user._id || o.user.id : o.user;
+          const userId = user._id || user.id;
+          return ((o.products && o.products.length > 0) || (o.items && o.items.length > 0)) && o.status && o.status !== 'ProcessingDefault' && orderUserId === userId;
+        }).map(o => (
           <OrderListItem
             key={o.id}
             order={o}
