@@ -80,17 +80,14 @@ exports.placeOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Order items required' });
     }
 
-
     // Reduce stock for each item (product or accessory)
     for (const item of items) {
-      // If productType is provided, use it. Otherwise, try to detect by checking Product/Accessory collections.
       let isAccessory = false;
       if (item.productType === 'accessory') {
         isAccessory = true;
       } else if (item.productType === 'product') {
         isAccessory = false;
       } else {
-        // Try to detect by checking existence in Product/Accessory
         const prod = await Product.findById(item.product);
         if (!prod) {
           const acc = await Accessory.findById(item.product);
@@ -104,12 +101,15 @@ exports.placeOrder = async (req, res) => {
       }
     }
 
-  // Always use the authenticated user for the order
-  // Fetch user email
-  const user = req.user || (await require('../models/User').findById(req.userId));
-  const userEmail = user && user.email ? user.email : '';
-  const order = await Order.create({ user: req.userId, userEmail, items, total, address, paymentInfo, status: 'Processing' });
-  res.status(201).json({ success: true, message: 'Order placed', data: order });
+    // Set delivery date to 3 days from now by default
+    const deliveryDate = new Date();
+    deliveryDate.setDate(deliveryDate.getDate() + 3);
+
+    // Always use the authenticated user for the order
+    const user = req.user || (await require('../models/User').findById(req.userId));
+    const userEmail = user && user.email ? user.email : '';
+    const order = await Order.create({ user: req.userId, userEmail, items, total, address, paymentInfo, status: 'Processing', deliveryDate });
+    res.status(201).json({ success: true, message: 'Order placed', data: order });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error', data: null });
   }
