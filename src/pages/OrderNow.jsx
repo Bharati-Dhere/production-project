@@ -238,18 +238,26 @@ export default function OrderNow() {
                   {allProductsAndAccessories.map((item) => (
                     <div key={item._id} className="bg-white rounded-xl shadow p-4 flex flex-col items-center border hover:shadow-lg transition">
                       <div className="flex justify-center items-center mb-2">
-                        {item.image || (Array.isArray(item.images) && item.images[0]) ? (
-                          <img
-                            src={item.image || (Array.isArray(item.images) && item.images[0])}
-                            alt={item.name || 'Product Image'}
-                            className="w-20 h-20 object-contain rounded bg-white"
-                            onError={e => { e.target.onerror = null; e.target.src = '/logo192.png'; }}
-                          />
-                        ) : (
-                          <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded">
-                            <span className="text-gray-400 text-xs">No Image</span>
-                          </div>
-                        )}
+                        {(() => {
+                          // Prefer image, then images[0], and ensure absolute URL
+                          const backendUrl = 'https://production-project-1.onrender.com';
+                          let imgSrc = item.image || (Array.isArray(item.images) && item.images[0]);
+                          if (imgSrc && !imgSrc.startsWith('http')) {
+                            imgSrc = backendUrl + imgSrc;
+                          }
+                          return imgSrc ? (
+                            <img
+                              src={imgSrc}
+                              alt={item.name || 'Product Image'}
+                              className="w-20 h-20 object-contain rounded bg-white"
+                              onError={e => { e.target.onerror = null; e.target.src = '/logo192.png'; }}
+                            />
+                          ) : (
+                            <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded">
+                              <span className="text-gray-400 text-xs">No Image</span>
+                            </div>
+                          );
+                        })()}
                       </div>
                       <div className="font-semibold text-gray-800 text-center mb-1">{item.name}</div>
                       <div className="text-xs text-blue-700 font-semibold mb-1 text-center">{item.category || item.type || 'Product'}</div>
@@ -281,7 +289,7 @@ export default function OrderNow() {
                   {orderProducts.map((p, idx) => (
                     <div key={p.id} className="flex items-center gap-4 border-b pb-3 last:border-b-0">
                       {/* Removed product image as requested */}
-                      <div className="flex-1">
+                      <div className="flex-1">   
                         <div className="font-medium text-gray-800">{p.name}</div>
                         <div className="text-xs text-gray-500 flex gap-2 items-center">
                           <span>Price: <span className="font-semibold text-green-700">₹{p.price}</span></span>
