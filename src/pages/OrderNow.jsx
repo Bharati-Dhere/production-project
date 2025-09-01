@@ -238,9 +238,9 @@ export default function OrderNow() {
                   {allProductsAndAccessories.map((item) => (
                     <div key={item._id} className="bg-white rounded-xl shadow p-4 flex flex-col items-center border hover:shadow-lg transition">
                       <div className="flex justify-center items-center mb-2">
-                        {item.image || item.imageUrl ? (
+                        {item.image || (Array.isArray(item.images) && item.images[0]) ? (
                           <img
-                            src={item.imageUrl || item.image}
+                            src={item.image || (Array.isArray(item.images) && item.images[0])}
                             alt={item.name || 'Product Image'}
                             className="w-20 h-20 object-contain rounded bg-white"
                             onError={e => { e.target.onerror = null; e.target.src = '/logo192.png'; }}
