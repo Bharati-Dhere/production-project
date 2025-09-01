@@ -65,10 +65,11 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
     setLoading(true);
     setMessage("");
     try {
-  const response = await fetch("https://production-project-1.onrender.com/api/auth/forgot-password/verify", {
+      // Only send email and code for verification, NOT password
+      const response = await fetch("https://production-project-1.onrender.com/api/auth/forgot-password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code, password: password || undefined }),
+        body: JSON.stringify({ email, code }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -76,13 +77,8 @@ export default function PasswordResetModal({ showModal, setShowModal }) {
         setLoading(false);
         return;
       }
-      if (step === 2) {
-        setStep(3);
-        setMessage("Code verified. Set your new password.");
-      } else {
-        setStep(4);
-        setMessage("Password updated successfully.");
-      }
+      setStep(3);
+      setMessage("Code verified. Set your new password.");
     } catch (err) {
       setMessage(err.message || "Invalid code.");
     }
