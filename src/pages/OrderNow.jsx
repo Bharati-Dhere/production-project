@@ -228,35 +228,36 @@ export default function OrderNow() {
           </div>
           {/* Add Product Modal */}
           {showAddProductModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
-                <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl" onClick={() => setShowAddProductModal(false)}>&times;</button>
-                <h2 className="text-xl font-bold mb-4 text-blue-700">Add Products & Accessories</h2>
-                <div className="overflow-y-auto max-h-[60vh]">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {allProductsAndAccessories.map((item) => (
-                      <div key={item._id} className="flex items-center gap-4 border-b pb-3 last:border-b-0">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 object-contain rounded bg-gray-100" />
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-800">{item.name}</div>
-                          <div className="text-xs text-gray-500 flex gap-2 items-center">
-                            <span>Price: <span className="font-semibold text-green-700">₹{item.price}</span></span>
-                            {item.deliveryPrice && item.deliveryPrice > 0 ? (
-                              <span>Delivery: <span className="font-semibold text-blue-700">₹{item.deliveryPrice}</span></span>
-                            ) : (
-                              <span className="text-green-600">Free Delivery</span>
-                            )}
-                            <span className="ml-2 px-2 py-1 rounded text-xs bg-gray-200 text-gray-700">{item.category || 'Product'}</span>
-                          </div>
-                        </div>
-                        {orderProducts.some(p => p.id === item._id) ? (
-                          <button className="ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700" onClick={() => setOrderProducts(orderProducts.filter(p => p.id !== item._id))}>Remove</button>
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex flex-col">
+              <div className="flex justify-end p-4">
+                <button className="text-3xl text-gray-400 hover:text-red-500" onClick={() => setShowAddProductModal(false)} title="Close">&times;</button>
+              </div>
+              <div className="flex-1 overflow-y-auto px-8 pb-8">
+                <h2 className="text-2xl font-bold mb-6 text-blue-700 text-center">Add Products & Accessories</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {allProductsAndAccessories.map((item) => (
+                    <div key={item._id} className="bg-white rounded-xl shadow p-4 flex flex-col items-center border hover:shadow-lg transition">
+                      {/* Optionally remove image if you want */}
+                      {/* <img src={item.image} alt={item.name} className="w-20 h-20 object-contain rounded mb-2 bg-gray-100" /> */}
+                      <div className="font-semibold text-gray-800 text-center mb-1">{item.name}</div>
+                      <div className="flex gap-2 items-center text-sm mb-2">
+                        <span className="font-semibold text-green-700">₹{item.price}</span>
+                        {item.deliveryPrice && item.deliveryPrice > 0 ? (
+                          <span className="text-blue-700">+ Delivery ₹{item.deliveryPrice}</span>
                         ) : (
-                          <button className="ml-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setOrderProducts([...orderProducts, { ...item, id: item._id, quantity: 1 }])}>Add</button>
+                          <span className="text-green-600">Free Delivery</span>
                         )}
                       </div>
-                    ))}
-                  </div>
+                      <span className="px-2 py-1 rounded text-xs bg-gray-200 text-gray-700 mb-2">{item.category || item.type || 'Product'}</span>
+                      <div className="mt-auto w-full flex justify-center">
+                        {orderProducts.some(p => p.id === item._id) ? (
+                          <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 w-full" onClick={() => setOrderProducts(orderProducts.filter(p => p.id !== item._id))}>Remove</button>
+                        ) : (
+                          <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-800 w-full" onClick={() => setOrderProducts([...orderProducts, { ...item, id: item._id, quantity: 1 }])}>Add</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
