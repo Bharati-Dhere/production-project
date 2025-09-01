@@ -508,7 +508,7 @@ export default function Profile() {
               <p className="text-gray-500">No current orders.</p>
             ) : (
               <ul className="space-y-2">
-        {orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').map(o => (
+        {orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled' && o.products && o.products.length > 0).map(o => (
           <OrderListItem
             key={o.id}
             order={o}
@@ -528,7 +528,7 @@ export default function Profile() {
               <p className="text-gray-500">No orders found.</p>
             ) : (
               <ul className="space-y-2">
-        {orders.map(o => (
+        {orders.filter(o => o.products && o.products.length > 0).map(o => (
           <OrderListItem
             key={o.id}
             order={o}
