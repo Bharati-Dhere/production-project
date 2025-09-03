@@ -22,9 +22,10 @@ export default function SearchResults() {
     }
     setLoading(true);
     setError("");
+    const backendUrl = 'https://production-project-1.onrender.com';
     Promise.all([
-      fetch(`/api/products?q=${encodeURIComponent(q)}`).then(res => res.json()),
-      fetch(`/api/accessories?q=${encodeURIComponent(q)}`).then(res => res.json())
+      fetch(`${backendUrl}/api/products?q=${encodeURIComponent(q)}`).then(res => res.json()),
+      fetch(`${backendUrl}/api/accessories?q=${encodeURIComponent(q)}`).then(res => res.json())
     ])
       .then(([productsData, accessoriesData]) => {
         const products = (productsData.success && Array.isArray(productsData.data)) ? productsData.data : [];
